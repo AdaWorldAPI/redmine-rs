@@ -45,6 +45,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod class_ids;
 pub mod convergence;
 
 use serde::Deserialize;
