@@ -84,6 +84,35 @@ shared `0x0103` identity is the first convergence invariant.
 > `project_member_role`, … are in-flight). The snapshot is regenerated, never
 > hand-edited.
 
+## Cross-fork convergence (the smoke test)
+
+`redmine-canon::convergence` carries a second artifact
+(`data/fork_convergence.json`) produced by running the OGAR producer over
+**both** real corpora (Redmine *and* OpenProject) and grouping by codebook
+id. It is the executable proof of the shared-codebook claim: **21 of 22
+concepts are contributed by both forks, with identical ids** — even where the
+Rails class names diverged across the lineage:
+
+| Canonical concept    | Redmine        | OpenProject   | id       |
+|----------------------|----------------|---------------|----------|
+| `project_work_item`  | `Issue`        | `WorkPackage` | `0x0102` |
+| `project_status`     | `IssueStatus`  | `Status`      | `0x0105` |
+| `project_type`       | `Tracker`      | `Type`        | `0x0106` |
+| `project_forum`      | `Board`        | `Forum`       | `0x0116` |
+| `project_relation`   | `IssueRelation`| `Relation`    | `0x0111` |
+
+Different words, same node. That is the whole thesis.
+
+### Known gap (honest)
+
+`billable_work_entry` (`0x0103`) currently shows **Redmine `TimeEntry` only**.
+OpenProject's `TimeEntry` lives in `modules/costs/app/models/`, and the
+extractor today walks **core `app/models/` only** — so ~311 modular-engine
+models (TimeEntry, budgets, BIM, …) are not yet harvested. A test pins this
+gap; closing it (walking `modules/*/app/models`) flips
+`billable_work_entry` to shared and is the next producer improvement for the
+OpenProject arm.
+
 ## Build
 
 ```bash

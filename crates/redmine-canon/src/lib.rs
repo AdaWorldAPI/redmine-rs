@@ -45,6 +45,8 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod convergence;
+
 use serde::Deserialize;
 
 /// The raw vendored snapshot JSON (the single source of truth).

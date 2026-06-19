@@ -1,0 +1,38 @@
+{
+  "schema_version": "fork-convergence/1",
+  "provenance": {
+    "extractor": "ogar-from-rails::extract_with → ruff_ruby_spo → ogar-from-ruff::lift_model_graph → ogar-vocab",
+    "redmine_repo": "AdaWorldAPI/redmine",
+    "openproject_repo": "AdaWorldAPI/openproject (core app/models only)",
+    "generated": "2026-06-19"
+  },
+  "forks": ["redmine", "openproject"],
+  "lineage": "redmine -> chiliproject -> openproject",
+  "redmine_total": 111,
+  "openproject_total": 681,
+  "shared_concepts": 21,
+  "concepts": [
+    { "concept": "billable_work_entry", "class_id": "0x0103", "class_id_le": [3, 1], "redmine": ["TimeEntry"], "openproject": [] },
+    { "concept": "priority", "class_id": "0x0107", "class_id_le": [7, 1], "redmine": ["IssuePriority"], "openproject": ["IssuePriority"] },
+    { "concept": "project", "class_id": "0x0101", "class_id_le": [1, 1], "redmine": ["Project"], "openproject": ["Project"] },
+    { "concept": "project_actor", "class_id": "0x0104", "class_id_le": [4, 1], "redmine": ["Principal", "User"], "openproject": ["Principal", "User"] },
+    { "concept": "project_attachment", "class_id": "0x010E", "class_id_le": [14, 1], "redmine": ["Attachment"], "openproject": ["Attachment"] },
+    { "concept": "project_changeset", "class_id": "0x0112", "class_id_le": [18, 1], "redmine": ["Changeset"], "openproject": ["Changeset"] },
+    { "concept": "project_comment", "class_id": "0x010F", "class_id_le": [15, 1], "redmine": ["Comment"], "openproject": ["Comment"] },
+    { "concept": "project_custom_field", "class_id": "0x0110", "class_id_le": [16, 1], "redmine": ["CustomField", "ProjectCustomField"], "openproject": ["CustomField", "ProjectCustomField"] },
+    { "concept": "project_forum", "class_id": "0x0116", "class_id_le": [22, 1], "redmine": ["Board"], "openproject": ["Forum"] },
+    { "concept": "project_journal", "class_id": "0x0109", "class_id_le": [9, 1], "redmine": ["Journal"], "openproject": ["Journal"] },
+    { "concept": "project_membership", "class_id": "0x0108", "class_id_le": [8, 1], "redmine": ["Member"], "openproject": ["Member"] },
+    { "concept": "project_message", "class_id": "0x0115", "class_id_le": [21, 1], "redmine": ["Message"], "openproject": ["Message"] },
+    { "concept": "project_news", "class_id": "0x0114", "class_id_le": [20, 1], "redmine": ["News"], "openproject": ["News"] },
+    { "concept": "project_query", "class_id": "0x010D", "class_id_le": [13, 1], "redmine": ["ProjectQuery", "Query"], "openproject": ["ProjectQuery", "Query"] },
+    { "concept": "project_relation", "class_id": "0x0111", "class_id_le": [17, 1], "redmine": ["IssueRelation", "Relations"], "openproject": ["Relation"] },
+    { "concept": "project_repository", "class_id": "0x010A", "class_id_le": [10, 1], "redmine": ["Repository"], "openproject": ["Repository"] },
+    { "concept": "project_status", "class_id": "0x0105", "class_id_le": [5, 1], "redmine": ["IssueStatus"], "openproject": ["Status"] },
+    { "concept": "project_type", "class_id": "0x0106", "class_id_le": [6, 1], "redmine": ["Tracker"], "openproject": ["Type"] },
+    { "concept": "project_version", "class_id": "0x010B", "class_id_le": [11, 1], "redmine": ["Version"], "openproject": ["Version"] },
+    { "concept": "project_watcher", "class_id": "0x0113", "class_id_le": [19, 1], "redmine": ["Watcher"], "openproject": ["Watcher"] },
+    { "concept": "project_wiki_page", "class_id": "0x010C", "class_id_le": [12, 1], "redmine": ["WikiPage"], "openproject": ["WikiPage"] },
+    { "concept": "project_work_item", "class_id": "0x0102", "class_id_le": [2, 1], "redmine": ["Issue"], "openproject": ["WorkPackage"] }
+  ]
+}
