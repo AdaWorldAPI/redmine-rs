@@ -15,6 +15,11 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "88904434abc2901f197fe8cc55f0445e7ded921dba5911dad2e2b39b48e663c4"
 
 [[package]]
+name = "ogar-vocab"
+version = "0.1.0"
+source = "git+https://github.com/AdaWorldAPI/OGAR?branch=main#6d2aa579aec02bb29860112172100b560c85bc75"
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.106"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -36,6 +41,7 @@ dependencies = [
 name = "redmine-canon"
 version = "0.1.0"
 dependencies = [
+ "ogar-vocab",
  "serde",
  "serde_json",
 ]

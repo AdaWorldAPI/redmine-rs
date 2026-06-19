@@ -9,3 +9,7 @@ description = "Canonical contract for the Redmine → Rust port: the OGAR codebo
 [dependencies]
 serde = { workspace = true }
 serde_json = { workspace = true }
+# Canonical home of the class-id constants (OGAR codebook). Re-exported by
+# `class_ids` so this port shares the single source of truth with
+# `op-canon` — the constants cannot drift across ports.
+ogar-vocab = { git = "https://github.com/AdaWorldAPI/OGAR", branch = "main" }
