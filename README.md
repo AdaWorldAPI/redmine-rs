@@ -93,29 +93,29 @@ shared `0x0103` identity is the first convergence invariant.
 `redmine-canon::convergence` carries a second artifact
 (`data/fork_convergence.json`) produced by running the OGAR producer over
 **both** real corpora (Redmine *and* OpenProject) and grouping by codebook
-id. It is the executable proof of the shared-codebook claim: **25 of 26
-concepts are contributed by both forks, with identical ids** — even where the
-Rails class names diverged across the lineage:
+id. It is the executable proof of the shared-codebook claim: **all 26
+concepts the Redmine corpus contributes are also contributed by OpenProject,
+with identical ids** — even where the Rails class names diverged across the
+lineage:
 
-| Canonical concept    | Redmine        | OpenProject   | id       |
-|----------------------|----------------|---------------|----------|
-| `project_work_item`  | `Issue`        | `WorkPackage` | `0x0102` |
-| `project_status`     | `IssueStatus`  | `Status`      | `0x0105` |
-| `project_type`       | `Tracker`      | `Type`        | `0x0106` |
-| `project_forum`      | `Board`        | `Forum`       | `0x0116` |
-| `project_relation`   | `IssueRelation`| `Relation`    | `0x0111` |
+| Canonical concept     | Redmine        | OpenProject   | id       |
+|-----------------------|----------------|---------------|----------|
+| `project_work_item`   | `Issue`        | `WorkPackage` | `0x0102` |
+| `billable_work_entry` | `TimeEntry`    | `TimeEntry` ✦ | `0x0103` |
+| `project_status`      | `IssueStatus`  | `Status`      | `0x0105` |
+| `project_type`        | `Tracker`      | `Type`        | `0x0106` |
+| `project_forum`       | `Board`        | `Forum`       | `0x0116` |
+| `project_relation`    | `IssueRelation`| `Relation`    | `0x0111` |
 
 Different words, same node. That is the whole thesis.
 
-### Known gap (honest)
-
-`billable_work_entry` (`0x0103`) currently shows **Redmine `TimeEntry` only**.
-OpenProject's `TimeEntry` lives in `modules/costs/app/models/`, and the
-extractor today walks **core `app/models/` only** — so ~311 modular-engine
-models (TimeEntry, budgets, BIM, …) are not yet harvested. A test pins this
-gap; closing it (walking `modules/*/app/models`) flips
-`billable_work_entry` to shared and is the next producer improvement for the
-OpenProject arm.
+✦ OpenProject's `TimeEntry` lives in `modules/costs/app/models/` — invisible
+to a core-only walk. The artifact now sources from the **engine-walking**
+extractor (ruff#28 + OGAR#75: `extract_app_with`), so the producer harvests
+core `app/models/` + every `modules/*/app/models/` (OpenProject grows from
+681 → 922 lifted classes). With that change, `billable_work_entry` (the
+first cross-domain bridge — Odoo's `account.analytic.line` lands here too in
+the commerce arm) is now contributed by **both forks**.
 
 ## Build
 

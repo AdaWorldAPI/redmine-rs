@@ -1,18 +1,18 @@
 {
-  "schema_version": "fork-convergence/1",
+  "schema_version": "fork-convergence/2",
   "provenance": {
-    "extractor": "ogar-from-rails::extract_with → ruff_ruby_spo → ogar-from-ruff::lift_model_graph → ogar-vocab",
+    "extractor": "ogar-from-rails::extract_app_with → ruff_ruby_spo::extract_app_with (engine-walk) → ogar-from-ruff::lift_model_graph → ogar-vocab",
     "redmine_repo": "AdaWorldAPI/redmine",
-    "openproject_repo": "AdaWorldAPI/openproject (core app/models only)",
+    "openproject_repo": "AdaWorldAPI/openproject (core app/models + modules/*/app/models)",
     "generated": "2026-06-19"
   },
   "forks": ["redmine", "openproject"],
   "lineage": "redmine -> chiliproject -> openproject",
   "redmine_total": 111,
-  "openproject_total": 681,
-  "shared_concepts": 25,
+  "openproject_total": 922,
+  "shared_concepts": 26,
   "concepts": [
-    { "concept": "billable_work_entry", "class_id": "0x0103", "class_id_le": [3, 1], "redmine": ["TimeEntry"], "openproject": [] },
+    { "concept": "billable_work_entry", "class_id": "0x0103", "class_id_le": [3, 1], "redmine": ["TimeEntry"], "openproject": ["TimeEntry"] },
     { "concept": "priority", "class_id": "0x0107", "class_id_le": [7, 1], "redmine": ["IssuePriority"], "openproject": ["IssuePriority"] },
     { "concept": "project", "class_id": "0x0101", "class_id_le": [1, 1], "redmine": ["Project"], "openproject": ["Project"] },
     { "concept": "project_actor", "class_id": "0x0104", "class_id_le": [4, 1], "redmine": ["Group", "Principal", "User"], "openproject": ["Group", "Principal", "User"] },
