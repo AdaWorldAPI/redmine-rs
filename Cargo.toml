@@ -1,0 +1,19 @@
+[workspace]
+resolver = "2"
+members = [
+    "crates/redmine-canon",
+]
+
+[workspace.package]
+version = "0.1.0"
+edition = "2021"
+rust-version = "1.95"
+authors = ["Redmine RS Contributors"]
+license = "GPL-2.0-or-later"
+repository = "https://github.com/AdaWorldAPI/redmine-rs"
+
+[workspace.dependencies]
+# Serialization (crates.io — the AdaWorldAPI-fork-only rule is scoped to the
+# ada ecosystem crates: ruff, OGAR, lance-graph, surrealdb, …).
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"

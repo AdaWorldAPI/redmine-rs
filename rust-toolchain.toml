@@ -1,0 +1,9 @@
+[toolchain]
+# AdaWorldAPI ecosystem-wide pin: rust 1.95 (matches openproject-nexgen-rs,
+# AdaWorldAPI/surrealdb, AdaWorldAPI/OGAR).
+#
+# Don't add a patch number to the channel string (`1.95.1` etc.) — that is
+# not a valid toolchain identifier. The minor version already routes to the
+# latest patch automatically.
+channel = "1.95"
+components = ["rustfmt", "clippy"]
