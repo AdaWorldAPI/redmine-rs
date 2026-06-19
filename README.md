@@ -47,34 +47,38 @@ canonical contract; the domain crates that build on it come next.
 
 ### What the snapshot says
 
-The producer pipeline extracted **111 Redmine classes**; **26** of them
-promote into **22 canonical concepts**, every id in the `0x01`
+The producer pipeline extracted **111 Redmine classes**; **31** of them
+promote into **26 canonical concepts**, every id in the `0x01`
 (project-management) domain block:
 
-| Redmine class(es)        | Canonical concept       | Codebook id |
-|--------------------------|-------------------------|-------------|
-| `Project`                | `project`               | `0x0101`    |
-| `Issue`                  | `project_work_item`     | `0x0102`    |
-| `TimeEntry`              | `billable_work_entry`   | `0x0103` ✦  |
-| `Principal`, `User`      | `project_actor`         | `0x0104`    |
-| `IssueStatus`            | `project_status`        | `0x0105`    |
-| `Tracker`                | `project_type`          | `0x0106`    |
-| `IssuePriority`          | `priority`              | `0x0107`    |
-| `Member`                 | `project_membership`    | `0x0108`    |
-| `Journal`                | `project_journal`       | `0x0109`    |
-| `Repository`             | `project_repository`    | `0x010A`    |
-| `Version`                | `project_version`       | `0x010B`    |
-| `WikiPage`               | `project_wiki_page`     | `0x010C`    |
-| `Query`, `ProjectQuery`  | `project_query`         | `0x010D`    |
-| `Attachment`             | `project_attachment`    | `0x010E`    |
-| `Comment`                | `project_comment`       | `0x010F`    |
+| Redmine class(es)              | Canonical concept       | Codebook id |
+|--------------------------------|-------------------------|-------------|
+| `Project`                      | `project`               | `0x0101`    |
+| `Issue`                        | `project_work_item`     | `0x0102`    |
+| `TimeEntry`                    | `billable_work_entry`   | `0x0103` ✦  |
+| `Principal`, `User`, `Group`   | `project_actor`         | `0x0104`    |
+| `IssueStatus`                  | `project_status`        | `0x0105`    |
+| `Tracker`                      | `project_type`          | `0x0106`    |
+| `IssuePriority`                | `priority`              | `0x0107`    |
+| `Member`                       | `project_membership`    | `0x0108`    |
+| `Journal`                      | `project_journal`       | `0x0109`    |
+| `Repository`                   | `project_repository`    | `0x010A`    |
+| `Version`                      | `project_version`       | `0x010B`    |
+| `WikiPage`                     | `project_wiki_page`     | `0x010C`    |
+| `Query`, `ProjectQuery`        | `project_query`         | `0x010D`    |
+| `Attachment`                   | `project_attachment`    | `0x010E`    |
+| `Comment`                      | `project_comment`       | `0x010F`    |
 | `CustomField`, `ProjectCustomField` | `project_custom_field` | `0x0110` |
-| `IssueRelation`, `Relations` | `project_relation`  | `0x0111`    |
-| `Changeset`              | `project_changeset`     | `0x0112`    |
-| `Watcher`                | `project_watcher`       | `0x0113`    |
-| `News`                   | `project_news`          | `0x0114`    |
-| `Message`                | `project_message`       | `0x0115`    |
-| `Board`                  | `project_forum`         | `0x0116`    |
+| `IssueRelation`, `Relations`   | `project_relation`      | `0x0111`    |
+| `Changeset`                    | `project_changeset`     | `0x0112`    |
+| `Watcher`                      | `project_watcher`       | `0x0113`    |
+| `News`                         | `project_news`          | `0x0114`    |
+| `Message`                      | `project_message`       | `0x0115`    |
+| `Board`                        | `project_forum`         | `0x0116`    |
+| `Role`                         | `project_role`          | `0x0117`    |
+| `MemberRole`                   | `project_member_role`   | `0x0118`    |
+| `CustomValue`                  | `project_custom_value`  | `0x0119`    |
+| `EnabledModule`                | `project_enabled_module`| `0x011A`    |
 
 ✦ `billable_work_entry` is a **cross-domain bridge**: Odoo's
 `account.analytic.line` (commerce/ERP) converges on the same concept, so the
@@ -89,7 +93,7 @@ shared `0x0103` identity is the first convergence invariant.
 `redmine-canon::convergence` carries a second artifact
 (`data/fork_convergence.json`) produced by running the OGAR producer over
 **both** real corpora (Redmine *and* OpenProject) and grouping by codebook
-id. It is the executable proof of the shared-codebook claim: **21 of 22
+id. It is the executable proof of the shared-codebook claim: **25 of 26
 concepts are contributed by both forks, with identical ids** — even where the
 Rails class names diverged across the lineage:
 

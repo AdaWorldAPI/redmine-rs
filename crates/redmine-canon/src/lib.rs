@@ -205,6 +205,13 @@ mod tests {
             ("Tracker", "project_type", 0x0106),
             ("IssuePriority", "priority", 0x0107),
             ("Board", "project_forum", 0x0116),
+            // OGAR #72 — RBAC permission-set, the actor side.
+            ("Role", "project_role", 0x0117),
+            // OGAR #73 — structural completers (3 concepts), all converge
+            // identically across the two forks.
+            ("MemberRole", "project_member_role", 0x0118),
+            ("CustomValue", "project_custom_value", 0x0119),
+            ("EnabledModule", "project_enabled_module", 0x011A),
         ] {
             let c = s
                 .concept_of_class(curator_class)
@@ -216,12 +223,19 @@ mod tests {
 
     #[test]
     fn project_actor_collapses_the_sti_chain() {
-        // Principal (STI root) + User (STI child) are the SAME actor
-        // identity — both Redmine classes converge onto one concept/id.
+        // Principal (STI root) + User + Group (both STI children) are the
+        // SAME actor identity — all three Redmine classes converge onto one
+        // concept/id. Group folded in via OGAR #72 (Principal STI subtype:
+        // assignable / member-able exactly where a User is).
         let s = Snapshot::load();
         let actor = s.concept("project_actor").unwrap();
-        assert!(actor.curator_classes.contains(&"User".to_string()));
-        assert!(actor.curator_classes.contains(&"Principal".to_string()));
+        for name in ["User", "Principal", "Group"] {
+            assert!(
+                actor.curator_classes.contains(&name.to_string()),
+                "{name} should collapse into project_actor (saw {:?})",
+                actor.curator_classes,
+            );
+        }
         assert_eq!(actor.class_id_u16(), 0x0104);
     }
 

@@ -87,7 +87,7 @@ mod tests {
         let fc = ForkConvergence::load();
         let shared: Vec<&ConvergedConcept> = fc.concepts.iter().filter(|c| c.shared()).collect();
         assert_eq!(shared.len(), fc.shared_concepts);
-        assert!(shared.len() >= 20, "expected the fork overlap to be broad");
+        assert!(shared.len() >= 25, "expected the fork overlap to be broad");
         for c in &shared {
             assert_eq!(
                 c.class_id_le[1], 0x01,
@@ -121,6 +121,34 @@ mod tests {
                 "{concept}: openproject should carry {op_name}"
             );
             assert_ne!(redmine_name, op_name, "the point is the names differ");
+        }
+    }
+
+    #[test]
+    fn structural_completers_converge_across_both_forks() {
+        // OGAR #72 + #73 — the actor/auth concept and the three structural
+        // completers all converge across both forks. Their canonical Rails
+        // names (Role, MemberRole, CustomValue, EnabledModule) appear in
+        // BOTH curators, even if a fork also ships extra specialized
+        // subclasses on top (OpenProject ships both `Role` AND `ProjectRole`,
+        // for instance — both collapse into project_role).
+        let fc = ForkConvergence::load();
+        for (concept, canonical_name) in [
+            ("project_role", "Role"),
+            ("project_member_role", "MemberRole"),
+            ("project_custom_value", "CustomValue"),
+            ("project_enabled_module", "EnabledModule"),
+        ] {
+            let c = fc
+                .concept(concept)
+                .unwrap_or_else(|| panic!("{concept} missing from convergence artifact"));
+            assert!(c.shared(), "{concept} must be contributed by both forks");
+            for (side, names) in [("redmine", &c.redmine), ("openproject", &c.openproject)] {
+                assert!(
+                    names.contains(&canonical_name.to_string()),
+                    "{concept}: {side} should carry {canonical_name} (saw {names:?})",
+                );
+            }
         }
     }
 
