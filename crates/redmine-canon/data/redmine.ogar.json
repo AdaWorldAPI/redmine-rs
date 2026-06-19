@@ -4,7 +4,7 @@
     "source_curator": "redmine",
     "source_repo": "AdaWorldAPI/redmine",
     "source_domain": "project",
-    "extractor": "ogar-from-rails::extract_with → ruff_ruby_spo → ogar-from-ruff::lift_model_graph → ogar-vocab",
+    "extractor": "ogar-from-rails::extract_app_with → ruff_ruby_spo::extract_app_with (engine-walk) → ogar-from-ruff::lift_model_graph → ogar-vocab",
     "ogar_codebook": "AdaWorldAPI/OGAR ogar-vocab CODEBOOK (0xDDCC domain-encoded)",
     "generated": "2026-06-19"
   },

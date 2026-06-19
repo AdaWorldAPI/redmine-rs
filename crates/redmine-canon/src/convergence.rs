@@ -45,7 +45,8 @@ impl ConvergedConcept {
 /// The full cross-fork convergence report.
 #[derive(Debug, Clone, Deserialize)]
 pub struct ForkConvergence {
-    /// Schema version tag (`"fork-convergence/1"`).
+    /// Schema version tag (`"fork-convergence/2"` since the engine-walking
+    /// extractor landed; `"fork-convergence/1"` was the core-only walk).
     pub schema_version: String,
     /// The two forks compared (`["redmine", "openproject"]`).
     pub forks: Vec<String>,
@@ -53,7 +54,8 @@ pub struct ForkConvergence {
     pub lineage: String,
     /// Total classes extracted from Redmine.
     pub redmine_total: usize,
-    /// Total classes extracted from OpenProject (core `app/models` only).
+    /// Total classes extracted from OpenProject (core `app/models` +
+    /// every `modules/*/app/models` engine, since `fork-convergence/2`).
     pub openproject_total: usize,
     /// Count of concepts both forks contribute to.
     pub shared_concepts: usize,
@@ -87,7 +89,7 @@ mod tests {
         let fc = ForkConvergence::load();
         let shared: Vec<&ConvergedConcept> = fc.concepts.iter().filter(|c| c.shared()).collect();
         assert_eq!(shared.len(), fc.shared_concepts);
-        assert!(shared.len() >= 25, "expected the fork overlap to be broad");
+        assert!(shared.len() >= 26, "expected the fork overlap to be broad");
         for c in &shared {
             assert_eq!(
                 c.class_id_le[1], 0x01,
@@ -153,19 +155,48 @@ mod tests {
     }
 
     #[test]
-    fn billable_work_entry_documents_the_modular_extraction_gap() {
-        // HONEST gap: OpenProject's TimeEntry lives in
-        // modules/costs/app/models, which the current extractor (core
-        // app/models only) does not walk — so OP's side of this bridge is
-        // empty today, while Redmine's TimeEntry IS harvested. Pinning the
-        // gap makes closing it (walking modules/*/app/models) visible: this
-        // concept flips to shared and the assertion below must be updated.
+    fn billable_work_entry_bridge_is_complete_both_forks() {
+        // The modular extraction gap is CLOSED (ruff#28 + OGAR#75
+        // extract_app_with): OpenProject's `TimeEntry` lives in
+        // modules/costs/app/models and is now harvested. Both forks ship a
+        // class literally named `TimeEntry` that lifts onto the same
+        // canonical concept and id — a clean, name-identical convergence on
+        // the first cross-domain bridge (the concept Odoo's
+        // account.analytic.line also lands on in the commerce arm).
         let fc = ForkConvergence::load();
         let bridge = fc.concept("billable_work_entry").unwrap();
         assert!(bridge.redmine.contains(&"TimeEntry".to_string()));
         assert!(
-            bridge.openproject.is_empty(),
-            "the modular extraction gap closed — promote billable_work_entry to a shared assertion"
+            bridge.openproject.contains(&"TimeEntry".to_string()),
+            "OpenProject TimeEntry must be harvested (extract_app_with)"
         );
+        assert!(
+            bridge.shared(),
+            "billable_work_entry must be shared by both forks"
+        );
+        assert_eq!(bridge.class_id_u16(), 0x0103);
+    }
+
+    #[test]
+    fn every_redmine_concept_has_an_openproject_witness() {
+        // The headline: with engine-walking, EVERY canonical concept the
+        // Redmine corpus contributes is also contributed by OpenProject.
+        // Convergence is total at the project-mgmt level — no Redmine-only
+        // promoted concept remains.
+        let fc = ForkConvergence::load();
+        for c in &fc.concepts {
+            if !c.redmine.is_empty() {
+                assert!(
+                    !c.openproject.is_empty(),
+                    "{} has Redmine witness but no OpenProject witness ({:?})",
+                    c.concept,
+                    c.redmine,
+                );
+            }
+        }
+        // Same statement in counts: every concept-with-a-Redmine-side has an
+        // OpenProject side too.
+        let redmine_concepts = fc.concepts.iter().filter(|c| !c.redmine.is_empty()).count();
+        assert_eq!(redmine_concepts, fc.shared_concepts);
     }
 }
