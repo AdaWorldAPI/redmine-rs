@@ -50,6 +50,7 @@ mod issue;
 mod news;
 mod project;
 mod role;
+mod scm;
 mod store;
 mod taxonomy;
 mod time_entry;
@@ -61,6 +62,7 @@ pub use issue::{IssueRow, NewIssue};
 pub use news::{NewNews, NewsRow};
 pub use project::{NewProject, ProjectRow};
 pub use role::{NewRole, RoleRow};
+pub use scm::{ChangesetRow, NewChangeset, NewRepository, RepositoryRow};
 pub use store::Store;
 pub use taxonomy::{
     IssuePriorityRow, IssueStatusRow, NewIssuePriority, NewIssueStatus, NewTracker, TrackerRow,
