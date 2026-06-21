@@ -26,7 +26,7 @@ use ogar_render_askama::{
 use rm_store::TimeEntryRow;
 use surrealdb_types::{RecordId, ToSql};
 
-use crate::common::{record_id_to_u64, wrap_in_doc, AppState, HandlerError};
+use crate::common::{html_escape, record_id_to_u64, wrap_in_doc, AppState, HandlerError};
 
 /// `GET /time_entries` — render the list of booked time entries.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -106,9 +106,14 @@ pub async fn detail(
     let cols = detail_columns();
     let href = format!("/time_entries/{}", id_str);
     let hours_str = format!("{:.2}", entry.hours);
+    // `spent_on` is user-controlled (Store accepts any String);
+    // escape before composing the headline anchor — the kit treats
+    // `headline_html` as already-rendered (codex P2 on PR #12).
     let headline = format!(
         "<a href=\"{}\" class=\"primary-link\">{} — {}h</a>",
-        href, &entry.spent_on, hours_str
+        html_escape(&href),
+        html_escape(&entry.spent_on),
+        hours_str
     );
     let subtitle = entry.comments.as_deref().unwrap_or("");
     let cells = vec![

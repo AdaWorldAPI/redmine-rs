@@ -16,13 +16,18 @@ use ogar_render_askama::{
 };
 use rm_store::RoleRow;
 
-use crate::common::{identifier_to_u64, wrap_in_doc, AppState, HandlerError};
+use crate::common::{
+    encode_path_segment, html_escape, identifier_to_u64, wrap_in_doc, AppState, HandlerError,
+};
 
 /// `GET /roles` — render the role list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
     let roles = state.store.list_roles().await?;
     let cols = list_columns();
-    let hrefs: Vec<String> = roles.iter().map(|r| format!("/roles/{}", r.name)).collect();
+    let hrefs: Vec<String> = roles
+        .iter()
+        .map(|r| format!("/roles/{}", encode_path_segment(&r.name)))
+        .collect();
     let positions: Vec<String> = roles.iter().map(|r| r.position.to_string()).collect();
     let ids: Vec<u64> = roles.iter().map(|r| identifier_to_u64(&r.name)).collect();
     let rows: Vec<RowSource<'_>> = roles
@@ -64,11 +69,12 @@ pub async fn detail(
 ) -> Result<Html<String>, HandlerError> {
     let role: RoleRow = state.store.find_role_by_name(&name).await?;
     let cols = detail_columns();
-    let href = format!("/roles/{}", role.name);
+    let href = format!("/roles/{}", encode_path_segment(&role.name));
     let position_str = role.position.to_string();
     let headline = format!(
         "<a href=\"{}\" class=\"primary-link\">{}</a>",
-        href, &role.name
+        html_escape(&href),
+        html_escape(&role.name)
     );
     let cells = vec![
         CellSource {
@@ -217,5 +223,33 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn list_percent_encodes_role_names_with_reserved_chars() {
+        // Codex P2 on PR #13: a role name with `#`/`?`/`/` would
+        // produce a URL the browser can't navigate to (`#` becomes a
+        // fragment, `/` a path segment). The list href must
+        // percent-encode the name.
+        let app = app_with_roles(&[("Q/A", 1), ("R&D", 2)]).await;
+        let res = app
+            .oneshot(
+                Request::builder()
+                    .uri("/roles")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let s = std::str::from_utf8(&body).unwrap();
+        assert!(
+            s.contains("href=\"/roles/Q%2FA\""),
+            "expected percent-encoded slash in href:\n{s}"
+        );
+        assert!(
+            s.contains("href=\"/roles/R%26D\""),
+            "expected percent-encoded ampersand in href:\n{s}"
+        );
     }
 }

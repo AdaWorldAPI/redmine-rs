@@ -16,7 +16,9 @@ use ogar_render_askama::{
 };
 use rm_store::UserRow;
 
-use crate::common::{identifier_to_u64, wrap_in_doc, AppState, HandlerError};
+use crate::common::{
+    encode_path_segment, html_escape, identifier_to_u64, wrap_in_doc, AppState, HandlerError,
+};
 
 /// `GET /users` — render the user list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -24,7 +26,7 @@ pub async fn list(State(state): State<AppState>) -> Result<Html<String>, Handler
     let cols = list_columns();
     let hrefs: Vec<String> = users
         .iter()
-        .map(|u| format!("/users/{}", u.login))
+        .map(|u| format!("/users/{}", encode_path_segment(&u.login)))
         .collect();
     let ids: Vec<u64> = users.iter().map(|u| identifier_to_u64(&u.login)).collect();
     let rows: Vec<RowSource<'_>> = users
@@ -66,10 +68,11 @@ pub async fn detail(
 ) -> Result<Html<String>, HandlerError> {
     let user: UserRow = state.store.find_user_by_login(&login).await?;
     let cols = detail_columns();
-    let href = format!("/users/{}", user.login);
+    let href = format!("/users/{}", encode_path_segment(&user.login));
     let headline = format!(
         "<a href=\"{}\" class=\"primary-link\">{}</a>",
-        href, &user.display_name
+        html_escape(&href),
+        html_escape(&user.display_name)
     );
     let cells = vec![
         CellSource {
