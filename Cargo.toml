@@ -3,6 +3,7 @@ resolver = "2"
 members = [
     "crates/redmine-canon",
     "crates/rm-server",
+    "crates/rm-store",
 ]
 
 [workspace.package]
