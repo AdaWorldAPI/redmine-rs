@@ -1,0 +1,56 @@
+[package]
+name = "rm-server"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Redmine-RS HTTP server — axum + askama scaffold. W0.1 of the Redmine Integration Plan; the foundation other workstreams (W0.2 rm-store, W0.3 rm-auth, W1..W8 width tracks) build on."
+
+[[bin]]
+name = "rm-server"
+path = "src/main.rs"
+
+[lib]
+name = "rm_server"
+
+[dependencies]
+# Canonical class layer — drives the hello-world handler (renders an
+# empty HtmlListView for `project_work_item` to prove the
+# askama_axum bridge resolves through the canonical concept).
+ogar-vocab          = { git = "https://github.com/AdaWorldAPI/OGAR", branch = "main" }
+# Render kit — the askama template harness this whole workstream
+# depends on. Per the Integration Plan §0, the kit already inherits
+# Redmine's 17-yr UX as data (`ColumnKind`, formatters); rm-server's
+# job is the routing + middleware shell that composes it.
+ogar-render-askama  = { git = "https://github.com/AdaWorldAPI/OGAR", branch = "main" }
+
+# Canonical concept ids re-exported through redmine-canon, so this
+# crate uses the same identity surface every other rm-* crate will.
+redmine-canon       = { path = "../redmine-canon" }
+
+# HTTP server.
+axum                = "0.7"
+askama              = "0.12"
+tokio               = { version = "1", features = ["macros", "rt-multi-thread", "signal"] }
+
+# Middleware stack (trace + compression + cors + cookies). One slice
+# per concern; the integration plan §4 (D3 RBAC) will compose
+# session middleware on top.
+tower               = "0.4"
+tower-http          = { version = "0.5", features = ["trace", "compression-gzip", "cors", "fs"] }
+tower-cookies       = "0.10"
+
+# Structured logging.
+tracing             = "0.1"
+tracing-subscriber  = { version = "0.3", features = ["env-filter"] }
+
+# Error glue for handler returns.
+thiserror           = "1"
+
+# Serde for query-string deserialization in handlers.
+serde               = { workspace = true }
+
+[dev-dependencies]
+tower               = { version = "0.4", features = ["util"] }
+http-body-util      = "0.1"
