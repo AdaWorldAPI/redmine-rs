@@ -49,8 +49,10 @@ mod error;
 mod issue;
 mod project;
 mod store;
+mod time_entry;
 
 pub use error::StoreError;
 pub use issue::{IssueRow, NewIssue};
 pub use project::{NewProject, ProjectRow};
 pub use store::Store;
+pub use time_entry::{NewTimeEntry, TimeEntryRow};

@@ -12,19 +12,15 @@
 //! common per-resource helpers factor out (Plan §1.6).
 
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
-use axum::response::{Html, IntoResponse, Response};
+use axum::response::Html;
 use axum::routing::get;
 use axum::Router;
 use ogar_render_askama::{
     render_detail, render_list, CellData, CellSource, ColumnKind, RenderColumn, RowSource,
 };
-use rm_store::{ProjectRow, StoreError};
-use std::collections::hash_map::DefaultHasher;
-use std::hash::{Hash, Hasher};
-use tracing::error;
+use rm_store::ProjectRow;
 
-use crate::common::{wrap_in_doc, AppState};
+use crate::common::{identifier_to_u64, wrap_in_doc, AppState, HandlerError};
 
 /// `GET /projects` — render the project list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -133,18 +129,6 @@ fn detail_columns() -> [RenderColumn; 2] {
     ]
 }
 
-/// Hash a project's identifier (URL slug) to a `u64` — the render
-/// kit's `record_id` parameter. Distinct from
-/// [`crate::common::record_id_to_u64`] (which hashes a SurrealDB
-/// `RecordId`): for Project we key on the human-readable
-/// identifier, so URLs and `data-record-id` attributes share the
-/// same derivation.
-fn identifier_to_u64(identifier: &str) -> u64 {
-    let mut h = DefaultHasher::new();
-    identifier.hash(&mut h);
-    h.finish()
-}
-
 /// Build the Project router.
 pub fn router(state: AppState) -> Router {
     Router::new()
@@ -153,35 +137,11 @@ pub fn router(state: AppState) -> Router {
         .with_state(state)
 }
 
-/// Handler error. Same shape as [`crate::issues::HandlerError`];
-/// factors into a shared type when W3 lands the third resource
-/// (Plan §1.6).
-#[derive(Debug, thiserror::Error)]
-pub enum HandlerError {
-    /// The store returned an error.
-    #[error("store: {0}")]
-    Store(#[from] StoreError),
-    /// Askama rendering failed.
-    #[error("render: {0}")]
-    Render(String),
-}
-
-impl IntoResponse for HandlerError {
-    fn into_response(self) -> Response {
-        let status = match &self {
-            Self::Store(StoreError::NotFound) => StatusCode::NOT_FOUND,
-            Self::Store(_) | Self::Render(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        error!(error = %self, "project handler error");
-        (status, status.canonical_reason().unwrap_or("error")).into_response()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use axum::body::Body;
-    use axum::http::Request;
+    use axum::http::{Request, StatusCode};
     use http_body_util::BodyExt;
     use rm_store::{NewProject, Store};
     use tower::ServiceExt;
@@ -283,11 +243,5 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
-    }
-
-    #[test]
-    fn identifier_to_u64_is_deterministic() {
-        assert_eq!(identifier_to_u64("alpha"), identifier_to_u64("alpha"));
-        assert_ne!(identifier_to_u64("alpha"), identifier_to_u64("beta"));
     }
 }

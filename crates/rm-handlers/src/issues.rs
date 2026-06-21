@@ -22,18 +22,16 @@
 //!   land when a Redmine-shaped `iid` column is added to the row.
 
 use axum::extract::{Path, State};
-use axum::http::StatusCode;
-use axum::response::{Html, IntoResponse, Response};
+use axum::response::Html;
 use axum::routing::get;
 use axum::Router;
 use ogar_render_askama::{
     render_detail, render_list, CellData, CellSource, ColumnKind, RenderColumn, RowSource,
 };
-use rm_store::{IssueRow, StoreError};
+use rm_store::IssueRow;
 use surrealdb_types::{RecordId, ToSql};
-use tracing::error;
 
-use crate::common::{record_id_to_u64, wrap_in_doc, AppState};
+use crate::common::{record_id_to_u64, wrap_in_doc, AppState, HandlerError};
 
 /// `GET /issues` — render the issue list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -158,41 +156,11 @@ pub fn router(state: AppState) -> Router {
         .with_state(state)
 }
 
-/// Handler error type. Maps to HTTP status; logs the underlying
-/// detail before mapping so the body never leaks more than a status
-/// line.
-///
-/// `Render` carries a `String`, not `askama::Error` — `askama` isn't a
-/// direct dep of `rm-handlers` (it's transitive through
-/// `ogar-render-askama`), and Rust doesn't let us name a transitive
-/// extern crate's type without re-declaring it. The render kit's
-/// `Result<String, askama::Error>` gets stringified at the call site.
-#[derive(Debug, thiserror::Error)]
-pub enum HandlerError {
-    /// The store returned an error.
-    #[error("store: {0}")]
-    Store(#[from] StoreError),
-    /// Askama rendering failed; body carries the formatted error.
-    #[error("render: {0}")]
-    Render(String),
-}
-
-impl IntoResponse for HandlerError {
-    fn into_response(self) -> Response {
-        let status = match &self {
-            Self::Store(StoreError::NotFound) => StatusCode::NOT_FOUND,
-            Self::Store(_) | Self::Render(_) => StatusCode::INTERNAL_SERVER_ERROR,
-        };
-        error!(error = %self, "issue handler error");
-        (status, status.canonical_reason().unwrap_or("error")).into_response()
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;
     use axum::body::Body;
-    use axum::http::Request;
+    use axum::http::{Request, StatusCode};
     use http_body_util::BodyExt;
     use rm_store::{NewIssue, Store};
     use tower::ServiceExt;
