@@ -48,6 +48,8 @@
 mod common;
 pub mod issues;
 pub mod projects;
+pub mod roles;
 pub mod time_entries;
+pub mod users;
 
 pub use common::{identifier_to_u64, record_id_to_u64, wrap_in_doc, AppState, HandlerError};
