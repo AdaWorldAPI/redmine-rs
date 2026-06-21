@@ -1,10 +1,15 @@
 //! Helpers every resource handler shares. Today's set:
 //! - [`AppState`] — shared axum `State`
 //! - [`wrap_in_doc`] — HTML shell until G1 lands the master template
+//!   (escapes the title — XSS guard, codex P1 on PR #10)
 //! - [`record_id_to_u64`] — URL → render-kit u64 adapter for
 //!   record-keyed resources (Issue)
 //! - [`identifier_to_u64`] — same adapter for slug-keyed resources
 //!   (Project) and any future resource whose URL key is a string
+//! - [`html_escape`] — minimal `& < > " '` escape, no extra dep
+//! - [`encode_path_segment`] — percent-encode a single URL path
+//!   segment so slug-keyed resources tolerate `# ? /` in the key
+//!   (codex P2 on PR #13)
 //! - [`HandlerError`] — the per-resource error enum; factored out
 //!   when W3 landed as the third caller (Plan §1.6 "three points
 //!   form a line")
@@ -27,16 +32,91 @@ pub struct AppState {
     pub store: Store,
 }
 
+/// HTML-escape the five attribute-/content-significant chars
+/// (`& < > " '`). No external dep — askama isn't a direct dep of
+/// rm-handlers (it's transitive via ogar-render-askama; pulling it
+/// in here re-triggers the askama_axum macro-expansion issue we hit
+/// in W0.1).
+///
+/// Used for any user-controlled string that lands in handler-built
+/// HTML *outside* the askama kit's render path — most importantly
+/// document titles ([`wrap_in_doc`]) and the pre-rendered
+/// `headline_html` passed to `render_detail` (the kit treats that
+/// parameter as raw HTML per the cell-template contract; user data
+/// must be escaped before it goes in).
+#[must_use]
+pub fn html_escape(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for c in s.chars() {
+        match c {
+            '&' => out.push_str("&amp;"),
+            '<' => out.push_str("&lt;"),
+            '>' => out.push_str("&gt;"),
+            '"' => out.push_str("&quot;"),
+            '\'' => out.push_str("&#39;"),
+            other => out.push(other),
+        }
+    }
+    out
+}
+
+/// Percent-encode a single URL path segment. Encodes everything
+/// that isn't an RFC-3986 unreserved char (`A-Z a-z 0-9 - . _ ~`)
+/// or the path-segment-safe `:` `@`.
+///
+/// Project identifiers + role names are arbitrary admin labels;
+/// without encoding a `#`/`?`/`/` in the name breaks the URL
+/// (codex P2 on PR #13). No external `percent-encoding` dep —
+/// the rule is small.
+#[must_use]
+pub fn encode_path_segment(s: &str) -> String {
+    let mut out = String::with_capacity(s.len());
+    for b in s.bytes() {
+        let safe = matches!(
+            b,
+            b'A'..=b'Z' | b'a'..=b'z' | b'0'..=b'9' | b'-' | b'.' | b'_' | b'~' | b':' | b'@'
+        );
+        if safe {
+            out.push(b as char);
+        } else {
+            out.push('%');
+            out.push(hex_nibble(b >> 4));
+            out.push(hex_nibble(b & 0x0F));
+        }
+    }
+    out
+}
+
+#[inline]
+fn hex_nibble(n: u8) -> char {
+    match n {
+        0..=9 => (b'0' + n) as char,
+        10..=15 => (b'A' + n - 10) as char,
+        _ => unreachable!(),
+    }
+}
+
 /// Wrap a fragment in a minimal HTML5 document. G1 (Plan §5 GUI
 /// chrome) will replace this with the master `base.askama` template
 /// — at that point this fn deletes and every handler uses
 /// `askama_axum::Template` directly.
+///
+/// The `title` parameter is **HTML-escaped** — handlers pass
+/// user-controlled strings (issue subjects, project names) and the
+/// raw value can't reach the `<title>` element verbatim (codex P1
+/// on PR #10, stored XSS via a subject like
+/// `</title><script>alert(1)</script>`).
+///
+/// `body` is treated as already-rendered HTML — askama-emitted by
+/// the kit's `render_list` / `render_detail`, which run their own
+/// `escape = "html"` on data-derived strings.
 #[must_use]
 pub fn wrap_in_doc(title: &str, body: &str) -> String {
+    let escaped_title = html_escape(title);
     format!(
         "<!doctype html>\n<html lang=\"en\">\n<head>\
          <meta charset=\"utf-8\">\
-         <title>{title} · Redmine RS</title>\
+         <title>{escaped_title} · Redmine RS</title>\
          </head><body>{body}</body></html>"
     )
 }
@@ -115,6 +195,45 @@ mod tests {
     }
 
     #[test]
+    fn wrap_in_doc_escapes_xss_in_title() {
+        // Codex P1 on PR #10: a subject like `</title><script>...`
+        // must not reach the document's <title> verbatim.
+        let html = wrap_in_doc("</title><script>alert(1)</script>", "<p>body</p>");
+        assert!(
+            !html.contains("</title><script>"),
+            "raw markup escaped past <title>: {html}"
+        );
+        assert!(
+            html.contains("&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;"),
+            "expected fully-escaped title: {html}"
+        );
+    }
+
+    #[test]
+    fn html_escape_covers_the_five_chars() {
+        assert_eq!(html_escape("&<>\"'"), "&amp;&lt;&gt;&quot;&#39;");
+        assert_eq!(html_escape("plain text"), "plain text");
+    }
+
+    #[test]
+    fn encode_path_segment_keeps_unreserved_chars() {
+        assert_eq!(
+            encode_path_segment("my-proj.v1_test~ok"),
+            "my-proj.v1_test~ok"
+        );
+    }
+
+    #[test]
+    fn encode_path_segment_percent_encodes_reserved() {
+        // Slashes / hashes / questions would break URL parsing
+        // (codex P2 on PR #13).
+        assert_eq!(encode_path_segment("a/b"), "a%2Fb");
+        assert_eq!(encode_path_segment("a#b"), "a%23b");
+        assert_eq!(encode_path_segment("a?b"), "a%3Fb");
+        assert_eq!(encode_path_segment("a b"), "a%20b");
+    }
+
+    #[test]
     fn record_id_to_u64_is_deterministic() {
         let rid = RecordId::new("project_work_item", "abc");
         let a = record_id_to_u64(&rid);
@@ -126,9 +245,6 @@ mod tests {
     fn record_id_to_u64_distinguishes_different_ids() {
         let a = record_id_to_u64(&RecordId::new("project_work_item", "id_a"));
         let b = record_id_to_u64(&RecordId::new("project_work_item", "id_b"));
-        // DefaultHasher isn't collision-proof but two different keys
-        // landing on the same u64 is astronomically unlikely; if this
-        // ever fails it's worth investigating.
         assert_ne!(a, b, "hash collision on two different ids");
     }
 

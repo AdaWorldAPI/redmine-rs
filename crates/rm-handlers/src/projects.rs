@@ -20,7 +20,9 @@ use ogar_render_askama::{
 };
 use rm_store::ProjectRow;
 
-use crate::common::{identifier_to_u64, wrap_in_doc, AppState, HandlerError};
+use crate::common::{
+    encode_path_segment, html_escape, identifier_to_u64, wrap_in_doc, AppState, HandlerError,
+};
 
 /// `GET /projects` — render the project list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -28,7 +30,7 @@ pub async fn list(State(state): State<AppState>) -> Result<Html<String>, Handler
     let cols = list_columns();
     let hrefs: Vec<String> = projects
         .iter()
-        .map(|p| format!("/projects/{}", p.identifier))
+        .map(|p| format!("/projects/{}", encode_path_segment(&p.identifier)))
         .collect();
     let ids: Vec<u64> = projects
         .iter()
@@ -73,10 +75,13 @@ pub async fn detail(
 ) -> Result<Html<String>, HandlerError> {
     let project: ProjectRow = state.store.find_project_by_identifier(&identifier).await?;
     let cols = detail_columns();
-    let href = format!("/projects/{}", project.identifier);
+    let href = format!("/projects/{}", encode_path_segment(&project.identifier));
+    // `project.name` is user-controlled — escape before composing
+    // the headline anchor (same XSS guard as W1's issue subject).
     let headline = format!(
         "<a href=\"{}\" class=\"primary-link\">{}</a>",
-        href, &project.name
+        html_escape(&href),
+        html_escape(&project.name)
     );
     let cells = vec![
         CellSource {

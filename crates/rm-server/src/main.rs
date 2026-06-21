@@ -19,10 +19,18 @@ async fn main() -> std::io::Result<()> {
         )
         .init();
 
-    let bind: SocketAddr = std::env::var("RM_BIND")
-        .ok()
-        .and_then(|s| s.parse().ok())
-        .unwrap_or_else(|| ServerConfig::default().bind);
+    // Distinguish unset from malformed (codex P1 on PR #7). Silently
+    // falling back to the default for a typo'd RM_BIND can make a
+    // bad deployment listen on the wrong interface or port.
+    let bind: SocketAddr = match std::env::var("RM_BIND") {
+        Err(std::env::VarError::NotPresent) => ServerConfig::default().bind,
+        Err(e) => {
+            return Err(std::io::Error::other(format!("RM_BIND env read: {e}")));
+        }
+        Ok(raw) => raw.parse().map_err(|e| {
+            std::io::Error::other(format!("RM_BIND='{raw}' is not a valid SocketAddr: {e}"))
+        })?,
+    };
 
     serve(ServerConfig { bind }).await
 }

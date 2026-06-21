@@ -31,7 +31,7 @@ use ogar_render_askama::{
 use rm_store::IssueRow;
 use surrealdb_types::{RecordId, ToSql};
 
-use crate::common::{record_id_to_u64, wrap_in_doc, AppState, HandlerError};
+use crate::common::{html_escape, record_id_to_u64, wrap_in_doc, AppState, HandlerError};
 
 /// `GET /issues` — render the issue list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -95,9 +95,13 @@ pub async fn detail(
     let issue: IssueRow = state.store.find_issue(&rid).await?;
     let cols = detail_columns();
     let href = format!("/issues/{}", id_str);
+    // Subject is user-controlled; the kit treats `headline_html` as
+    // already-rendered HTML, so we escape before composing the link
+    // (codex P1 on PR #10).
     let headline = format!(
         "<a href=\"{}\" class=\"primary-link\">{}</a>",
-        href, &issue.subject
+        html_escape(&href),
+        html_escape(&issue.subject)
     );
     let subtitle = issue.description.as_deref().unwrap_or("");
     let cells = vec![CellSource {
@@ -273,5 +277,50 @@ mod tests {
             .await
             .unwrap();
         assert_eq!(res.status(), StatusCode::NOT_FOUND);
+    }
+
+    #[tokio::test]
+    async fn detail_escapes_xss_in_subject_for_title_and_headline() {
+        // Codex P1 on PR #10. Two paths both need escaping:
+        // 1) the <title> via `wrap_in_doc(title=...)` — fixed in `common`
+        // 2) the headline anchor passed as `headline_html` to render_detail —
+        //    the kit treats that arg as already-rendered HTML and `|safe`s
+        //    it through, so this handler must escape before composing.
+        let store = Store::open().await.unwrap();
+        let inserted = store
+            .create_issue(NewIssue {
+                subject: "</title><script>alert(1)</script>".to_string(),
+                description: None,
+            })
+            .await
+            .unwrap();
+        let rid = inserted.id.unwrap();
+        let key = rid.key.to_sql();
+        let app = router(AppState { store });
+        let res = app
+            .oneshot(
+                Request::builder()
+                    .uri(format!("/issues/{key}"))
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let s = std::str::from_utf8(&body).unwrap();
+        assert!(
+            !s.contains("</title><script>"),
+            "raw subject survived into title — XSS:\n{s}"
+        );
+        assert!(
+            !s.contains("<script>alert(1)"),
+            "raw script tag survived into headline — XSS:\n{s}"
+        );
+        // The escaped form should appear (in <title> AND in the
+        // headline anchor text).
+        assert!(
+            s.contains("&lt;/title&gt;&lt;script&gt;alert(1)"),
+            "expected escaped form somewhere:\n{s}"
+        );
     }
 }
