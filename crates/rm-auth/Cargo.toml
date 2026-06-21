@@ -1,0 +1,38 @@
+[package]
+name = "rm-auth"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Redmine-RS authentication — signed-cookie sessions + a login handler + current-user extractor. W0.3 of the Redmine Integration Plan."
+
+[lib]
+name = "rm_auth"
+
+[dependencies]
+# rm-server's middleware stack already wires `CookieManagerLayer`; this
+# crate layers signed-cookie session state on top of that slot.
+axum                = "0.7"
+tower-cookies       = { version = "0.10", features = ["signed"] }
+# axum 0.7's `FromRequestParts` trait still uses `#[async_trait]`
+# (impls require the same attribute).
+async-trait         = "0.1"
+
+# Forms (the login POST handler takes an application/x-www-form-urlencoded body).
+serde               = { workspace = true }
+
+# Constant-time string comparison for the seed-user credential check.
+# Deliberately tiny — argon2 + DB-backed users land in W4 (Plan §3
+# admin track), this is the MVP shape.
+subtle              = "2"
+
+# Async runtime + error glue.
+tokio               = { version = "1", features = ["macros", "rt-multi-thread"] }
+thiserror           = "1"
+tracing             = "0.1"
+
+[dev-dependencies]
+tower               = { version = "0.4", features = ["util"] }
+http-body-util      = "0.1"
+tokio               = { version = "1", features = ["macros", "rt-multi-thread", "test-util"] }
