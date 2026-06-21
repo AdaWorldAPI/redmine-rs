@@ -50,6 +50,7 @@ mod issue;
 mod project;
 mod role;
 mod store;
+mod taxonomy;
 mod time_entry;
 mod user;
 
@@ -58,5 +59,8 @@ pub use issue::{IssueRow, NewIssue};
 pub use project::{NewProject, ProjectRow};
 pub use role::{NewRole, RoleRow};
 pub use store::Store;
+pub use taxonomy::{
+    IssuePriorityRow, IssueStatusRow, NewIssuePriority, NewIssueStatus, NewTracker, TrackerRow,
+};
 pub use time_entry::{NewTimeEntry, TimeEntryRow};
 pub use user::{NewUser, UserRow};

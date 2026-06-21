@@ -49,6 +49,7 @@ mod common;
 pub mod issues;
 pub mod projects;
 pub mod roles;
+pub mod taxonomy;
 pub mod time_entries;
 pub mod users;
 
