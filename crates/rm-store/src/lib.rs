@@ -47,15 +47,18 @@
 
 mod error;
 mod issue;
+mod news;
 mod project;
 mod role;
 mod store;
 mod taxonomy;
 mod time_entry;
 mod user;
+mod wiki_page;
 
 pub use error::StoreError;
 pub use issue::{IssueRow, NewIssue};
+pub use news::{NewNews, NewsRow};
 pub use project::{NewProject, ProjectRow};
 pub use role::{NewRole, RoleRow};
 pub use store::Store;
@@ -64,3 +67,4 @@ pub use taxonomy::{
 };
 pub use time_entry::{NewTimeEntry, TimeEntryRow};
 pub use user::{NewUser, UserRow};
+pub use wiki_page::{NewWikiPage, WikiPageRow};
