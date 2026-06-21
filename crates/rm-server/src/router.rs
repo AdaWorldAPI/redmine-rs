@@ -9,6 +9,9 @@ use std::net::SocketAddr;
 
 use axum::routing::get;
 use axum::Router;
+use rm_auth::Config as AuthConfig;
+use rm_handlers::AppState;
+use rm_store::Store;
 use tower_cookies::CookieManagerLayer;
 use tower_http::compression::CompressionLayer;
 use tower_http::cors::CorsLayer;
@@ -54,9 +57,33 @@ pub fn build_router() -> Router {
     Router::new()
         .route("/", get(index))
         .route("/healthz", get(healthz))
-        // Width tracks insert their merges here in alphabetical
-        // order. Example after W1 (issues) lands:
-        //   .merge(rm_handlers::issues::router())
+        .layer(CookieManagerLayer::new())
+        .layer(CorsLayer::permissive())
+        .layer(CompressionLayer::new())
+        .layer(TraceLayer::new_for_http())
+}
+
+/// Build the full router with all Phase-1 resource handlers + the
+/// auth surface mounted.
+///
+/// Per Plan §8 file ownership, **this** is the merge file the W*
+/// tracks add to. The convention: each W track adds its `.merge(...)`
+/// call in alphabetical order on `path` so parallel branches don't
+/// conflict.
+///
+/// Today's mounts:
+/// - `rm_auth::router(auth_cfg)` — `/login`, `/logout`, `/me`
+/// - `rm_handlers::issues::router(state)` — `/issues`, `/issues/:id` (W1)
+pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
+    let state = AppState { store };
+    Router::new()
+        .route("/", get(index))
+        .route("/healthz", get(healthz))
+        // ── W* width tracks — keep merge calls alphabetised on the URL
+        //    path so parallel branches don't conflict on this file. ──
+        .merge(rm_handlers::issues::router(state.clone())) // W1: /issues
+        // ── Phase-0 auxiliary surfaces ──
+        .merge(rm_auth::router(auth_cfg)) //               /login, /logout, /me
         .layer(CookieManagerLayer::new())
         .layer(CorsLayer::permissive())
         .layer(CompressionLayer::new())
@@ -73,7 +100,13 @@ pub fn build_router() -> Router {
 /// Surfaces the underlying `tokio` / `axum` error if binding fails,
 /// the listener errors, or graceful-shutdown plumbing breaks.
 pub async fn serve(config: ServerConfig) -> std::io::Result<()> {
-    let app = build_router();
+    // Boot the Phase-0 substrate the resource handlers depend on.
+    let store = Store::open()
+        .await
+        .map_err(|e| std::io::Error::other(format!("store open: {e}")))?;
+    let auth_cfg = AuthConfig::key_from_env().unwrap_or_else(AuthConfig::with_random_key);
+
+    let app = build_router_with(store, auth_cfg);
     let listener = tokio::net::TcpListener::bind(config.bind).await?;
     tracing::info!(bind = %config.bind, "rm-server listening");
     axum::serve(listener, app)

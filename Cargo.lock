@@ -3271,6 +3271,23 @@ dependencies = [
 ]
 
 [[package]]
+name = "rm-handlers"
+version = "0.1.0"
+dependencies = [
+ "axum 0.7.9",
+ "http-body-util",
+ "ogar-render-askama",
+ "redmine-canon",
+ "rm-auth",
+ "rm-store",
+ "surrealdb-types",
+ "thiserror 1.0.69",
+ "tokio",
+ "tower 0.4.13",
+ "tracing",
+]
+
+[[package]]
 name = "rm-server"
 version = "0.1.0"
 dependencies = [
@@ -3280,6 +3297,9 @@ dependencies = [
  "ogar-render-askama",
  "ogar-vocab",
  "redmine-canon",
+ "rm-auth",
+ "rm-handlers",
+ "rm-store",
  "serde",
  "thiserror 1.0.69",
  "tokio",
