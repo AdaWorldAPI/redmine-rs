@@ -29,6 +29,13 @@ ogar-render-askama  = { git = "https://github.com/AdaWorldAPI/OGAR", branch = "m
 # crate uses the same identity surface every other rm-* crate will.
 redmine-canon       = { path = "../redmine-canon" }
 
+# Phase-0 substrate + Phase-1 resource handlers, mounted by
+# `build_router_with`. rm-server is the integration point per the
+# Plan §8 file-ownership table.
+rm-store            = { path = "../rm-store" }
+rm-auth             = { path = "../rm-auth" }
+rm-handlers         = { path = "../rm-handlers" }
+
 # HTTP server.
 axum                = "0.7"
 askama              = "0.12"

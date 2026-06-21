@@ -75,6 +75,29 @@ impl Store {
             Err(e) => Err(StoreError::Surreal(e)),
         }
     }
+
+    /// List every Issue in the store, in insertion order.
+    ///
+    /// MVP-shaped: no pagination, no filter / sort / group — those
+    /// live in D2 (Plan §4 depth track). Today's list view renders
+    /// whatever the store hands back.
+    ///
+    /// # Errors
+    ///
+    /// - [`StoreError::Surreal`] on driver failures.
+    /// - **Not** an error to return an empty Vec; the list page's
+    ///   empty-state shows in that case (the askama kit pins
+    ///   `"No data."` already).
+    pub async fn list_issues(&self) -> Result<Vec<IssueRow>, StoreError> {
+        match self.db().select::<Vec<IssueRow>>("project_work_item").await {
+            Ok(rows) => Ok(rows),
+            // Same "empty table = not-found" quirk find_issue handles
+            // — for the list path that's "no rows yet", an empty
+            // result, not an error.
+            Err(e) if e.is_not_found() => Ok(Vec::new()),
+            Err(e) => Err(StoreError::Surreal(e)),
+        }
+    }
 }
 
 #[cfg(test)]
@@ -121,5 +144,36 @@ mod tests {
         let inserted = store.create_issue(new.clone()).await.unwrap();
         assert_eq!(inserted.subject, new.subject);
         assert!(inserted.description.is_none());
+    }
+
+    #[tokio::test]
+    async fn list_issues_returns_empty_for_fresh_store() {
+        let store = Store::open().await.unwrap();
+        let rows = store.list_issues().await.expect("list must succeed");
+        assert!(rows.is_empty(), "fresh store has no issues: got {rows:?}");
+    }
+
+    #[tokio::test]
+    async fn list_issues_returns_inserted_rows() {
+        let store = Store::open().await.unwrap();
+        for i in 0..3 {
+            store
+                .create_issue(NewIssue {
+                    subject: format!("issue {i}"),
+                    description: None,
+                })
+                .await
+                .unwrap();
+        }
+        let rows = store.list_issues().await.unwrap();
+        assert_eq!(rows.len(), 3, "expected 3 issues, got {}", rows.len());
+        let subjects: Vec<&str> = rows.iter().map(|r| r.subject.as_str()).collect();
+        for i in 0..3 {
+            let needle = format!("issue {i}");
+            assert!(
+                subjects.contains(&needle.as_str()),
+                "missing `{needle}` in {subjects:?}"
+            );
+        }
     }
 }
