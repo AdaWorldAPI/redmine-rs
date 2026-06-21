@@ -83,6 +83,7 @@ pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
         //    path so parallel branches don't conflict on this file. ──
         .merge(rm_handlers::issues::router(state.clone())) // W1: /issues
         .merge(rm_handlers::projects::router(state.clone())) // W2: /projects
+        .merge(rm_handlers::time_entries::router(state.clone())) // W3: /time_entries
         // ── Phase-0 auxiliary surfaces ──
         .merge(rm_auth::router(auth_cfg)) //               /login, /logout, /me
         .layer(CookieManagerLayer::new())
