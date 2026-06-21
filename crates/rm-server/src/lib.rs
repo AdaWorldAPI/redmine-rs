@@ -27,7 +27,7 @@
 //!
 //! - Not a data layer — `rm-store` (W0.2) lands SurrealDB integration.
 //! - Not an auth surface — `rm-auth` (W0.3) lands session middleware
-//!   + login. This crate sets up [`tower_cookies::CookieManagerLayer`]
+//!   and login. This crate sets up [`tower_cookies::CookieManagerLayer`]
 //!   so W0.3 has the slot to wire its session layer through.
 //! - Not the rendered layout chrome — `G1` lands the `base.askama`
 //!   master template + nav. Today the hello-world handler emits a

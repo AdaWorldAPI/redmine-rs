@@ -50,7 +50,6 @@ impl Default for ServerConfig {
 ///     auth lands.
 ///   - `CookieManagerLayer`: the slot W0.3 (rm-auth) layers its
 ///     session middleware on top of.
-#[must_use]
 pub fn build_router() -> Router {
     Router::new()
         .route("/", get(index))
