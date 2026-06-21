@@ -1,0 +1,47 @@
+[package]
+name = "rm-store"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+description = "Redmine-RS persistence layer — SurrealDB-backed store keyed by canonical OGAR class_ids. W0.2 of the Redmine Integration Plan."
+
+[lib]
+name = "rm_store"
+
+[dependencies]
+# Canonical class layer — drives `Store::open()` to apply the full
+# 32-concept schema via `ogar_adapter_surrealql::emit_surrealql_ddl`.
+ogar-vocab           = { git = "https://github.com/AdaWorldAPI/OGAR", branch = "main" }
+ogar-adapter-surrealql = { git = "https://github.com/AdaWorldAPI/OGAR", branch = "main" }
+
+# Re-export of the codebook ids — keeps rm-store on the same identity
+# surface every other rm-* crate already uses (consistent with
+# rm-server's redmine-canon re-export).
+redmine-canon        = { path = "../redmine-canon" }
+
+# SurrealDB — AdaWorldAPI fork (per the workspace dep-policy comment;
+# ada-ecosystem crates use the fork, crates.io for everything else).
+# `kv-mem` is the in-memory storage engine — the MVP target. The
+# `kv-rocksdb` / `kv-surrealkv` feature switch lands in a follow-up
+# (file-backed Store::open_at(path)).
+surrealdb            = { git = "https://github.com/AdaWorldAPI/surrealdb", branch = "main", default-features = false, features = ["kv-mem"] }
+# `surrealdb-types` carries the `SurrealValue` derive + `RecordId` /
+# `RecordIdKey` types row structs need. The surrealdb crate
+# re-exports it as `surrealdb::types::*`, but the derive macro emits
+# `::surrealdb_types::…` paths so we need it as a direct dep.
+surrealdb-types      = { git = "https://github.com/AdaWorldAPI/surrealdb", branch = "main" }
+
+# Serde stays around for handler-side JSON the store may pass through
+# (when REST API parity lands as a depth track). Not required for
+# the SurrealValue derive itself.
+serde                = { workspace = true }
+
+# Async runtime + error glue.
+tokio                = { version = "1", features = ["macros", "rt-multi-thread"] }
+thiserror            = "1"
+tracing              = "0.1"
+
+[dev-dependencies]
+tokio                = { version = "1", features = ["macros", "rt-multi-thread", "test-util"] }
