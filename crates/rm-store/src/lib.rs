@@ -48,11 +48,15 @@
 mod error;
 mod issue;
 mod project;
+mod role;
 mod store;
 mod time_entry;
+mod user;
 
 pub use error::StoreError;
 pub use issue::{IssueRow, NewIssue};
 pub use project::{NewProject, ProjectRow};
+pub use role::{NewRole, RoleRow};
 pub use store::Store;
 pub use time_entry::{NewTimeEntry, TimeEntryRow};
+pub use user::{NewUser, UserRow};
