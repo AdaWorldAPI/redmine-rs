@@ -82,6 +82,7 @@ pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
         // ── W* width tracks — keep merge calls alphabetised on the URL
         //    path so parallel branches don't conflict on this file. ──
         .merge(rm_handlers::issues::router(state.clone())) // W1: /issues
+        .merge(rm_handlers::projects::router(state.clone())) // W2: /projects
         // ── Phase-0 auxiliary surfaces ──
         .merge(rm_auth::router(auth_cfg)) //               /login, /logout, /me
         .layer(CookieManagerLayer::new())

@@ -47,8 +47,10 @@
 
 mod error;
 mod issue;
+mod project;
 mod store;
 
 pub use error::StoreError;
 pub use issue::{IssueRow, NewIssue};
+pub use project::{NewProject, ProjectRow};
 pub use store::Store;
