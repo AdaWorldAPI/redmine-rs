@@ -47,11 +47,13 @@
 
 mod common;
 pub mod issues;
+pub mod news;
 pub mod projects;
 pub mod roles;
 pub mod taxonomy;
 pub mod time_entries;
 pub mod users;
+pub mod wiki_pages;
 
 pub use common::{
     encode_path_segment, html_escape, identifier_to_u64, record_id_to_u64, wrap_in_doc, AppState,
