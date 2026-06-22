@@ -50,6 +50,7 @@ pub mod issues;
 pub mod news;
 pub mod projects;
 pub mod roles;
+pub mod scm;
 pub mod taxonomy;
 pub mod time_entries;
 pub mod users;
