@@ -84,6 +84,8 @@ pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
         .merge(rm_handlers::issues::router(state.clone())) // W1: /issues
         .merge(rm_handlers::news::router(state.clone())) // W6a: /news
         .merge(rm_handlers::projects::router(state.clone())) // W2: /projects
+        .merge(rm_handlers::queries::router(state.clone())) // W8a: /queries
+        .merge(rm_handlers::relations::router(state.clone())) // W8b: /relations
         .merge(rm_handlers::roles::router(state.clone())) // W4b: /roles
         .merge(rm_handlers::scm::router(state.clone())) // W7: /repositories + /changesets
         .merge(rm_handlers::taxonomy::router(state.clone())) // W5: /issue_statuses + /trackers + /enumerations/issue_priorities
