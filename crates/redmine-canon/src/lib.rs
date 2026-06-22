@@ -45,6 +45,7 @@
 #![forbid(unsafe_code)]
 #![warn(missing_docs)]
 
+pub mod app;
 pub mod class_ids;
 pub mod class_view;
 pub mod convergence;
