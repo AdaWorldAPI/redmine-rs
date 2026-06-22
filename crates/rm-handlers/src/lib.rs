@@ -49,6 +49,8 @@ mod common;
 pub mod issues;
 pub mod news;
 pub mod projects;
+pub mod queries;
+pub mod relations;
 pub mod roles;
 pub mod scm;
 pub mod taxonomy;
