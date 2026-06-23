@@ -1,0 +1,39 @@
+# Everything that doesn't belong in the build context — keeps the
+# Docker layer cache stable + avoids shipping local build artifacts.
+
+# Rust build / target dirs anywhere in the workspace.
+target/
+**/target/
+
+# IDE / editor noise.
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Git internals are needed by some build steps; keep .git but exclude
+# its packfiles when they're huge. Cargo doesn't need .git.
+.git/
+.gitignore
+.gitattributes
+
+# Test fixtures + bench data that don't ship.
+**/tests/fixtures/
+**/benches/data/
+
+# CI configs.
+.github/
+.claude/
+
+# Container artifacts (don't recursively ship dockerfiles into themselves).
+Dockerfile
+.dockerignore
+docker-compose*.yml
+
+# Editor-local lockfiles.
+*.lock.bak
+
+# Logs / temporary files.
+*.log
+*.tmp
+.DS_Store

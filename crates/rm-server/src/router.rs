@@ -82,6 +82,7 @@ pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
         // ── W* width tracks — keep merge calls alphabetised on the URL
         //    path so parallel branches don't conflict on this file. ──
         .merge(rm_handlers::issues::router(state.clone())) // W1: /issues
+        .merge(rm_handlers::issues_form::router(state.clone())) // D1: /issues/new + POST /issues
         .merge(rm_handlers::news::router(state.clone())) // W6a: /news
         .merge(rm_handlers::projects::router(state.clone())) // W2: /projects
         .merge(rm_handlers::queries::router(state.clone())) // W8a: /queries
@@ -114,14 +115,52 @@ pub async fn serve(config: ServerConfig) -> std::io::Result<()> {
     let store = Store::open()
         .await
         .map_err(|e| std::io::Error::other(format!("store open: {e}")))?;
+    // POC autohydrate: seed the demo corpus on first boot if the store is
+    // empty AND `RM_SEED` isn't set to a disable value. Idempotent — a
+    // second boot in the same process is a no-op. See rm_store::seed.
+    let seeded = rm_store::seed::hydrate_demo_data_on_boot(&store)
+        .await
+        .map_err(|e| std::io::Error::other(format!("seed: {e}")))?;
+    if seeded > 0 {
+        tracing::info!(rows = seeded, "demo data hydrated on boot");
+    }
     let auth_cfg = AuthConfig::key_from_env().unwrap_or_else(AuthConfig::with_random_key);
 
     let app = build_router_with(store, auth_cfg);
-    let listener = tokio::net::TcpListener::bind(config.bind).await?;
-    tracing::info!(bind = %config.bind, "rm-server listening");
+    // Honour $PORT for PaaS deploys (Railway, Heroku, Cloud Run, Fly route
+    // their public 443/80 edge to $PORT internally; the container MUST bind
+    // 0.0.0.0:$PORT or the proxy can't reach it). Fall back to the
+    // configured host:port for local / non-PaaS deploys.
+    let addr = resolve_bind_addr(std::env::var("PORT").ok(), config.bind)?;
+    let listener = tokio::net::TcpListener::bind(addr).await?;
+    tracing::info!(bind = %addr, "rm-server listening");
     axum::serve(listener, app)
         .with_graceful_shutdown(shutdown_signal())
         .await
+}
+
+/// Resolve the bind address from `$PORT` (when set) or the configured
+/// fallback. PaaS proxies route their public edge to `$PORT` and require
+/// the app to bind `0.0.0.0:$PORT`; non-PaaS keeps the configured
+/// `host:port`. Whitespace-only `$PORT` values are treated as unset.
+///
+/// Pure helper — the env read happens at the [`serve`] call site so the
+/// parse logic is testable without touching process env (the crate is
+/// `#![forbid(unsafe_code)]`; `std::env::set_var` is unsafe in recent
+/// Rust). Tests cover set / unset / whitespace / malformed input.
+///
+/// Mirrors `op-server`'s same-named helper (op-nexgen PR #58 — both ports
+/// land the lance-graph `CONSUMER_SCAN_TODO.md §B1` PaaS pattern).
+fn resolve_bind_addr(
+    env_port: Option<String>,
+    fallback: SocketAddr,
+) -> std::io::Result<SocketAddr> {
+    match env_port.as_deref().map(str::trim) {
+        Some(p) if !p.is_empty() => format!("0.0.0.0:{p}")
+            .parse()
+            .map_err(|e| std::io::Error::other(format!("invalid PORT env var `{p}`: {e}"))),
+        _ => Ok(fallback),
+    }
 }
 
 /// Wait for SIGINT (Ctrl-C) or SIGTERM. Used by the bin to trigger
@@ -210,5 +249,43 @@ mod tests {
         let cfg = ServerConfig::default();
         assert_eq!(cfg.bind.port(), 3000);
         assert!(cfg.bind.ip().is_unspecified());
+    }
+
+    // ── PaaS deploy: $PORT bind (mirrors op-server PR #58 §B1) ──────
+
+    fn fallback() -> SocketAddr {
+        ServerConfig::default().bind
+    }
+
+    #[test]
+    fn resolve_bind_addr_uses_port_env_when_set() {
+        let addr = resolve_bind_addr(Some("3000".into()), fallback()).unwrap();
+        assert_eq!(addr, "0.0.0.0:3000".parse().unwrap());
+    }
+
+    #[test]
+    fn resolve_bind_addr_falls_back_when_port_env_is_unset() {
+        let addr = resolve_bind_addr(None, fallback()).unwrap();
+        assert_eq!(addr, fallback());
+    }
+
+    #[test]
+    fn resolve_bind_addr_treats_empty_or_whitespace_port_as_unset() {
+        for empty in ["", " ", "\t", " \n "] {
+            let addr = resolve_bind_addr(Some(empty.into()), fallback()).unwrap();
+            assert_eq!(addr, fallback(), "{empty:?} should fall back");
+        }
+    }
+
+    #[test]
+    fn resolve_bind_addr_rejects_malformed_port_with_diagnostic() {
+        for bad in ["abc", "70000", "-1", "8080:extra"] {
+            let err = resolve_bind_addr(Some(bad.into()), fallback()).unwrap_err();
+            let msg = err.to_string();
+            assert!(
+                msg.contains("invalid PORT") && msg.contains(bad),
+                "input {bad:?} should yield a diagnostic naming the value; got {msg}",
+            );
+        }
     }
 }
