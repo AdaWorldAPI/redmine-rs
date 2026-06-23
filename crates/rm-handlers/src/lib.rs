@@ -47,6 +47,7 @@
 
 mod common;
 pub mod issues;
+pub mod list_chrome;
 pub mod news;
 pub mod projects;
 pub mod queries;
@@ -62,3 +63,4 @@ pub use common::{
     encode_path_segment, html_escape, identifier_to_u64, record_id_to_u64, wrap_in_doc, AppState,
     HandlerError,
 };
+pub use list_chrome::{ListQuery, SortDir};

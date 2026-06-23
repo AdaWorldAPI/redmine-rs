@@ -26,6 +26,10 @@ surrealdb-types      = { git = "https://github.com/AdaWorldAPI/surrealdb", branc
 # HTTP server primitives.
 axum                 = "0.7"
 
+# Query-string deserialization for the D2 filter / sort / paginate extractor
+# on /issues. Workspace serde — same version every other crate already pulls.
+serde                = { workspace = true }
+
 # Async runtime + error glue.
 tokio                = { version = "1", features = ["macros", "rt-multi-thread"] }
 thiserror            = "1"
