@@ -53,6 +53,7 @@ mod query;
 mod relation;
 mod role;
 mod scm;
+pub mod seed;
 mod store;
 mod taxonomy;
 mod time_entry;
