@@ -34,13 +34,33 @@
 //! prefix** (`APP-CLASS-CODEBOOK-LAYOUT.md` §1, §3d), not minting an OGAR
 //! codebook class — that mint is gated on OGAR's 5+3 pass. The pull (low
 //! half) is the part that is canonical and available today.
+//!
+//! # One source of truth — the OGAR surface
+//!
+//! Both halves of the composition come from `ogar-vocab` (OGAR PR #97):
+//!
+//! - [`APP_PREFIX`] is a `pub const` re-export of
+//!   [`ogar_vocab::ports::RedminePort::APP_PREFIX`] — the typed §2
+//!   allocation-table value, not a local literal.
+//! - [`render_classid`] re-exports `ogar_vocab::app::render_classid_for::<RedminePort>`
+//!   — the central `(prefix << 16) | concept` composition; one place owns the
+//!   bit math.
+//!
+//! Same discipline as [`crate::class_ids`] (which re-exports
+//! `ogar_vocab::class_ids::*`): the canonical layer mints; this crate
+//! re-exports. Drift between local and OGAR is now structurally impossible.
+//! (Symmetric to `op-canon`'s `app` module — openproject-nexgen-rs#57.)
 
 use ogar_vocab::ports::{PortSpec, RedminePort};
 
 /// Redmine's reserved **APP / render prefix** — the high u16 of a full
 /// `classid` (`APP-CLASS-CODEBOOK-LAYOUT.md` §2 allocation table). Pairs with
 /// OpenProject's `0x0001`: same low-half concept, different render lens.
-pub const APP_PREFIX: u16 = 0x0007;
+///
+/// `pub const` re-export of [`ogar_vocab::ports::RedminePort::APP_PREFIX`]
+/// (OGAR PR #97). Promoted from a local mirror to the typed upstream constant —
+/// one source of truth.
+pub const APP_PREFIX: u16 = RedminePort::APP_PREFIX;
 
 /// Pull the canonical class-id for a Redmine surface name **via the OGAR
 /// port** — the #589 "pull OGAR via class" path (no bridge, no registry).
@@ -58,15 +78,18 @@ pub fn class_id_of(surface_name: &str) -> Option<u16> {
 }
 
 /// Compose the full 32-bit **render** classid for a shared `concept` under
-/// Redmine's prefix: `(APP_PREFIX << 16) | concept` → `0x0007_DDCC`.
+/// Redmine's prefix: `0x0007_DDCC`.
+///
+/// Re-export of `ogar_vocab::app::render_classid_for::<RedminePort>(concept)`
+/// (OGAR PR #97) — the central composition, not local bit math.
 ///
 /// ```
 /// use redmine_canon::{app, class_ids};
 /// assert_eq!(app::render_classid(class_ids::PROJECT_WORK_ITEM), 0x0007_0102);
 /// ```
 #[must_use]
-pub const fn render_classid(concept: u16) -> u32 {
-    ((APP_PREFIX as u32) << 16) | (concept as u32)
+pub fn render_classid(concept: u16) -> u32 {
+    ogar_vocab::app::render_classid_for::<RedminePort>(concept)
 }
 
 /// Pull + compose in one step: a Redmine surface name → its full render
@@ -109,8 +132,15 @@ mod tests {
     }
 
     #[test]
-    fn render_classid_composes_redmine_prefix() {
+    fn app_prefix_re_exports_the_typed_ogar_constant() {
+        // One source of truth: the local constant IS the upstream typed
+        // PortSpec::APP_PREFIX, not a parallel literal. (#97)
+        assert_eq!(APP_PREFIX, RedminePort::APP_PREFIX);
         assert_eq!(APP_PREFIX, 0x0007);
+    }
+
+    #[test]
+    fn render_classid_composes_redmine_prefix() {
         // Full render classid = 0x0007_DDCC (W0 worked table).
         assert_eq!(render_classid(class_ids::PROJECT_WORK_ITEM), 0x0007_0102);
         assert_eq!(render_classid(class_ids::BILLABLE_WORK_ENTRY), 0x0007_0103);
@@ -121,10 +151,28 @@ mod tests {
     }
 
     #[test]
+    fn render_classid_agrees_with_the_central_ogar_composition() {
+        // The local function is exactly OGAR's `render_classid_for::<P>`; no
+        // local bit math. If this assertion ever fails, the local impl drifted
+        // from the canonical upstream composition.
+        for &concept in &[
+            class_ids::PROJECT_WORK_ITEM,
+            class_ids::PROJECT,
+            class_ids::BILLABLE_WORK_ENTRY,
+            class_ids::PROJECT_ROLE,
+        ] {
+            assert_eq!(
+                render_classid(concept),
+                ogar_vocab::app::render_classid_for::<RedminePort>(concept),
+            );
+        }
+    }
+
+    #[test]
     fn render_classid_keeps_concept_in_the_low_half() {
         // The low half is the shared concept (== the port pull); the high
         // half is Redmine's render lens. OpenProject's twin carries the
-        // SAME low half under prefix 0x0001 — "two renders, one concept".
+        // SAME low half under prefix 0x0001 (pinned in OGAR's port tests).
         for &concept in &[
             class_ids::PROJECT_WORK_ITEM,
             class_ids::PROJECT,
@@ -132,8 +180,18 @@ mod tests {
             class_ids::PROJECT_ROLE,
         ] {
             let cid = render_classid(concept);
-            assert_eq!((cid >> 16) as u16, APP_PREFIX, "high half = Redmine lens");
-            assert_eq!(cid as u16, concept, "low half = shared concept");
+            // Decompose via OGAR's central helpers (one source of truth on the
+            // bit math, not local shifts).
+            assert_eq!(
+                ogar_vocab::app::app_of(cid),
+                APP_PREFIX,
+                "high half = Redmine lens",
+            );
+            assert_eq!(
+                ogar_vocab::app::concept_of(cid),
+                concept,
+                "low half = shared concept",
+            );
         }
     }
 
