@@ -10,6 +10,11 @@
 //!   ([`ListQuery`]: `?q=`, `?sort=`, `?page=`, `?per_page=`).
 //! - `GET /issues/:id` — detail page for a single issue.
 //!
+//! The **create form** (`GET /issues/new` + `POST /issues`) is the D1
+//! depth-track sibling at [`crate::issues_form`] — it mounts a separate
+//! router so the merge-conflict boundary stays one-track-per-file (Plan
+//! §8). `rm-server` merges both.
+//!
 //! # Today's scope
 //!
 //! - Columns hardcoded; the `default_columns_for(&class)` factoring
@@ -18,8 +23,8 @@
 //!   paginate (25/page default, capped at 100). Status / priority /
 //!   tracker / assignee filters wait until those FKs land on the
 //!   `IssueRow` (W2/W3 taxonomy, W4 actor).
-//! - No edit form (D1 — Plan §4). The create form will live in a
-//!   sibling module.
+//! - **D1** — create form lives in [`crate::issues_form`]. Edit
+//!   (`PATCH /issues/:id`) is its own follow-on (D1.2).
 //! - URL `:id` is the SurrealDB record-key segment (string ulid).
 //!   The render-kit's u64 `record_id` parameter is filled via
 //!   [`common::record_id_to_u64`] (stable hash); proper integer ids
