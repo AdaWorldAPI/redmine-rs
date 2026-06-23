@@ -161,23 +161,23 @@ impl ListQuery {
             r#"<form class="list-filter" method="get" action="{action_esc}" role="search">
   <input type="search" name="q" value="{needle}" placeholder="{placeholder_esc}" aria-label="Filter">"#
         );
-        if let Some(spec) = self.sort.as_deref() {
-            if !spec.is_empty() {
-                let _ = write!(
-                    &mut out,
-                    r#"<input type="hidden" name="sort" value="{}">"#,
-                    html_escape(spec)
-                );
-            }
+        // `.filter(|s| !s.is_empty())` collapses the empty-check into the
+        // pattern so clippy's `collapsible_if` doesn't fire on a nested
+        // `if let Some(_) { if !is_empty { ... } }` (workspace is edition
+        // 2021 — let-chains aren't available here).
+        if let Some(spec) = self.sort.as_deref().filter(|s| !s.is_empty()) {
+            let _ = write!(
+                &mut out,
+                r#"<input type="hidden" name="sort" value="{}">"#,
+                html_escape(spec)
+            );
         }
-        if let Some(per_page) = self.per_page {
-            // Preserve the explicit override; omit when default.
-            if per_page != 25 {
-                let _ = write!(
-                    &mut out,
-                    r#"<input type="hidden" name="per_page" value="{per_page}">"#
-                );
-            }
+        // Preserve the explicit per_page override; omit when default (25).
+        if let Some(per_page) = self.per_page.filter(|p| *p != 25) {
+            let _ = write!(
+                &mut out,
+                r#"<input type="hidden" name="per_page" value="{per_page}">"#
+            );
         }
         out.push_str(r#"<button type="submit">Apply</button>"#);
         if !needle.is_empty() {
@@ -272,25 +272,19 @@ impl ListQuery {
     /// [`Self::render_pagination`].
     fn as_query_path(&self, action: &str) -> String {
         let mut parts: Vec<String> = Vec::new();
-        if let Some(q) = self.q.as_deref() {
-            if !q.is_empty() {
-                parts.push(format!("q={}", percent_encode(q)));
-            }
+        // `.filter()` collapses each predicate into the pattern so clippy's
+        // `collapsible_if` doesn't fire (edition 2021 — no let-chains).
+        if let Some(q) = self.q.as_deref().filter(|q| !q.is_empty()) {
+            parts.push(format!("q={}", percent_encode(q)));
         }
-        if let Some(s) = self.sort.as_deref() {
-            if !s.is_empty() {
-                parts.push(format!("sort={}", percent_encode(s)));
-            }
+        if let Some(s) = self.sort.as_deref().filter(|s| !s.is_empty()) {
+            parts.push(format!("sort={}", percent_encode(s)));
         }
-        if let Some(p) = self.page {
-            if p > 1 {
-                parts.push(format!("page={p}"));
-            }
+        if let Some(p) = self.page.filter(|p| *p > 1) {
+            parts.push(format!("page={p}"));
         }
-        if let Some(pp) = self.per_page {
-            if pp != 25 {
-                parts.push(format!("per_page={pp}"));
-            }
+        if let Some(pp) = self.per_page.filter(|p| *p != 25) {
+            parts.push(format!("per_page={pp}"));
         }
         if parts.is_empty() {
             html_escape(action)
@@ -522,7 +516,6 @@ mod tests {
             sort: Some("subject:desc".into()),
             page: Some(2),
             per_page: Some(50),
-            ..Default::default()
         };
         let nav = q.render_pagination("/issues", 200);
         // Both Prev (→ page 1, omitted since canonical) and Next (→ page 3)

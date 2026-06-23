@@ -136,23 +136,23 @@ fn apply_filter_sort<'a>(issues: &'a [IssueRow], q: &ListQuery) -> Vec<&'a Issue
             .filter(|i| i.subject.to_lowercase().contains(&needle))
             .collect()
     };
-    if let Some((col, dir)) = q.sort() {
-        // Only sort on columns we recognise — guards against a hostile
-        // `?sort=<garbage>` triggering a partial-order on a column the
-        // row doesn't carry today.
-        if SORTABLE_COLUMNS.contains(&col) {
-            match col {
-                "subject" => view.sort_by(|a, b| a.subject.cmp(&b.subject)),
-                "id" => view.sort_by_key(|i| {
-                    i.id.as_ref()
-                        .map(|rid| rid.key.to_sql())
-                        .unwrap_or_default()
-                }),
-                _ => {} // SORTABLE_COLUMNS guard above
-            }
-            if dir == SortDir::Desc {
-                view.reverse();
-            }
+    // Only sort on columns we recognise — guards against a hostile
+    // `?sort=<garbage>` triggering a partial-order on a column the row
+    // doesn't carry today. `.filter()` collapses the column-allowlist
+    // check into the pattern so clippy's `collapsible_if` doesn't fire
+    // (workspace is edition 2021 — let-chains aren't available here).
+    if let Some((col, dir)) = q.sort().filter(|(c, _)| SORTABLE_COLUMNS.contains(c)) {
+        match col {
+            "subject" => view.sort_by(|a, b| a.subject.cmp(&b.subject)),
+            "id" => view.sort_by_key(|i| {
+                i.id.as_ref()
+                    .map(|rid| rid.key.to_sql())
+                    .unwrap_or_default()
+            }),
+            _ => {} // SORTABLE_COLUMNS allow-list above
+        }
+        if dir == SortDir::Desc {
+            view.reverse();
         }
     }
     view
