@@ -52,6 +52,7 @@ pub mod issues_form;
 pub mod list_chrome;
 pub mod news;
 pub mod projects;
+pub mod projects_form;
 pub mod queries;
 pub mod relations;
 pub mod roles;
