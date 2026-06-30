@@ -96,10 +96,29 @@ fn hex_nibble(n: u8) -> char {
     }
 }
 
-/// Wrap a fragment in a minimal HTML5 document. G1 (Plan §5 GUI
-/// chrome) will replace this with the master `base.askama` template
-/// — at that point this fn deletes and every handler uses
-/// `askama_axum::Template` directly.
+/// Redmine's global `#top-menu` — the persistent bar of cross-app links
+/// rendered on every page. The link set is fixed, so it's a `const` the
+/// formatter splices in verbatim (no per-request allocation beyond the
+/// outer `format!`). Mirrors Redmine's top menu shape (Home + the global
+/// resource lists); the `id`/`class` hooks match Redmine so G1's
+/// stylesheet drops straight in over this skeleton.
+const TOP_MENU: &str = concat!(
+    r#"<div id="top-menu"><ul class="menu">"#,
+    r#"<li><a class="home" href="/">Home</a></li>"#,
+    r#"<li><a href="/projects">Projects</a></li>"#,
+    r#"<li><a href="/issues">Issues</a></li>"#,
+    r#"<li><a href="/time_entries">Spent time</a></li>"#,
+    r#"<li><a href="/news">News</a></li>"#,
+    r#"<li><a href="/wiki">Wiki</a></li>"#,
+    r#"</ul></div>"#,
+);
+
+/// Wrap a fragment in the **master-layout skeleton** — an HTML5 document
+/// carrying Redmine's persistent chrome: the global `#top-menu` nav, the
+/// `#header` app title, and a `#main` > `#content` wrapper the fragment
+/// lands in. G1 (Plan §5 GUI chrome) swaps this Rust-built shell for the
+/// real `base.askama` master template + a stylesheet; the markup shape
+/// (ids/classes) is already Redmine-compatible so that swap is cosmetic.
 ///
 /// The `title` parameter is **HTML-escaped** — handlers pass
 /// user-controlled strings (issue subjects, project names) and the
@@ -109,15 +128,21 @@ fn hex_nibble(n: u8) -> char {
 ///
 /// `body` is treated as already-rendered HTML — askama-emitted by
 /// the kit's `render_list` / `render_detail`, which run their own
-/// `escape = "html"` on data-derived strings.
+/// `escape = "html"` on data-derived strings — and the handler-built
+/// chrome (`render_action_bar`, the filter/sort/pagination strips),
+/// which escape their own user-derived inputs.
 #[must_use]
 pub fn wrap_in_doc(title: &str, body: &str) -> String {
     let escaped_title = html_escape(title);
     format!(
         "<!doctype html>\n<html lang=\"en\">\n<head>\
          <meta charset=\"utf-8\">\
+         <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\">\
          <title>{escaped_title} · Redmine RS</title>\
-         </head><body>{body}</body></html>"
+         </head><body>{TOP_MENU}\
+         <div id=\"header\"><h1><a href=\"/\">Redmine RS</a></h1></div>\
+         <div id=\"main\"><div id=\"content\">{body}</div></div>\
+         </body></html>"
     )
 }
 
@@ -207,6 +232,34 @@ mod tests {
             html.contains("&lt;/title&gt;&lt;script&gt;alert(1)&lt;/script&gt;"),
             "expected fully-escaped title: {html}"
         );
+    }
+
+    #[test]
+    fn wrap_in_doc_renders_global_top_menu_and_content_wrapper() {
+        // Every page carries Redmine's persistent chrome: the global
+        // top menu, the app header, and a #content wrapper the fragment
+        // lands inside.
+        let html = wrap_in_doc("Issues", "<p>body</p>");
+        assert!(
+            html.contains(r#"id="top-menu""#),
+            "top menu missing:\n{html}"
+        );
+        assert!(
+            html.contains(r#"<a class="home" href="/">Home</a>"#),
+            "Home link missing:\n{html}"
+        );
+        assert!(
+            html.contains(r#"href="/projects""#) && html.contains(r#"href="/issues""#),
+            "global resource links missing:\n{html}"
+        );
+        assert!(
+            html.contains(r#"id="content""#),
+            "content wrapper missing:\n{html}"
+        );
+        // The fragment still renders inside the shell.
+        assert!(html.contains("<p>body</p>"), "body not wrapped:\n{html}");
+        // Viewport meta for the eventual responsive stylesheet.
+        assert!(html.contains("viewport"), "viewport meta missing:\n{html}");
     }
 
     #[test]
