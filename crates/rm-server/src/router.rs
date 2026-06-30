@@ -97,6 +97,7 @@ pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
         .merge(rm_handlers::time_entries::router(state.clone())) // W3: /time_entries
         .merge(rm_handlers::users::router(state.clone())) // W4a: /users
         .merge(rm_handlers::wiki_pages::router(state.clone())) // W6b: /wiki
+        .merge(rm_handlers::wiki_form::router(state.clone())) // D1: /wiki/new + POST /wiki
         // ── Phase-0 auxiliary surfaces ──
         .merge(rm_auth::router(auth_cfg)) //               /login, /logout, /me
         .layer(CookieManagerLayer::new())

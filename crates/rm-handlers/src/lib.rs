@@ -61,6 +61,7 @@ pub mod scm;
 pub mod taxonomy;
 pub mod time_entries;
 pub mod users;
+pub mod wiki_form;
 pub mod wiki_pages;
 
 pub use common::{
