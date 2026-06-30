@@ -46,6 +46,7 @@
 #![warn(missing_docs)]
 
 mod common;
+pub mod home;
 pub mod issues;
 pub mod issues_form;
 pub mod list_chrome;

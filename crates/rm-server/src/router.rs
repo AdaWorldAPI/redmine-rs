@@ -72,15 +72,17 @@ pub fn build_router() -> Router {
 /// conflict.
 ///
 /// Today's mounts:
+/// - `rm_handlers::home::router(state)` — `/` (cross-resource overview)
 /// - `rm_auth::router(auth_cfg)` — `/login`, `/logout`, `/me`
 /// - `rm_handlers::issues::router(state)` — `/issues`, `/issues/:id` (W1)
 pub fn build_router_with(store: Store, auth_cfg: AuthConfig) -> Router {
     let state = AppState { store };
     Router::new()
-        .route("/", get(index))
         .route("/healthz", get(healthz))
         // ── W* width tracks — keep merge calls alphabetised on the URL
-        //    path so parallel branches don't conflict on this file. ──
+        //    path so parallel branches don't conflict on this file. The
+        //    home overview owns `/`, so it sorts first. ──
+        .merge(rm_handlers::home::router(state.clone())) // Home: / (overview)
         .merge(rm_handlers::issues::router(state.clone())) // W1: /issues
         .merge(rm_handlers::issues_form::router(state.clone())) // D1: /issues/new + POST /issues
         .merge(rm_handlers::news::router(state.clone())) // W6a: /news

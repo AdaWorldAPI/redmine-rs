@@ -49,7 +49,7 @@ use rm_store::IssueRow;
 use surrealdb_types::{RecordId, ToSql};
 
 use crate::common::{html_escape, record_id_to_u64, wrap_in_doc, AppState, HandlerError};
-use crate::list_chrome::{ListQuery, SortDir};
+use crate::list_chrome::{render_action_bar, ListQuery, SortDir};
 
 /// The list URL — used by the chrome to build self-referential links
 /// (filter form action, sort headers, pagination Prev/Next).
@@ -117,14 +117,16 @@ pub async fn list(
     let table = render_list("Issues", 0x0102, "project_work_item", &cols, &[], &rows)
         .map_err(|e| HandlerError::Render(e.to_string()))?;
 
-    // Chrome composes around the table: filter bar above (with search +
-    // clear), clickable sort headers (column-by-column links over the
-    // existing table rows — emitted as a small nav block above the
-    // table), and pagination strip below.
+    // Chrome composes around the table: the contextual action bar at the
+    // very top (Redmine's "+ New issue" jump), filter bar below it (search
+    // + clear), clickable sort headers (column-by-column links over the
+    // existing table rows — emitted as a small nav block above the table),
+    // and pagination strip below.
+    let action_bar = render_action_bar(&[("New issue", "/issues/new")]);
     let filter_bar = q.render_filter_bar(LIST_PATH, "Filter by subject");
     let sort_nav = render_sort_nav(&q);
     let pagination = q.render_pagination(LIST_PATH, total);
-    let body = format!("{filter_bar}\n{sort_nav}\n{table}\n{pagination}");
+    let body = format!("{action_bar}\n{filter_bar}\n{sort_nav}\n{table}\n{pagination}");
     Ok(Html(wrap_in_doc("Issues", &body)))
 }
 
@@ -319,6 +321,20 @@ mod tests {
         );
         // But the filter bar always renders (so the user can type to add data).
         assert!(s.contains("list-filter"), "filter bar always renders:\n{s}");
+    }
+
+    #[tokio::test]
+    async fn list_shows_new_issue_action_link() {
+        // The Redmine "+ New issue" CTA must sit on the list page and point
+        // at the D1 create form — present even on an empty list (that's the
+        // whole point of the empty state: a place to start adding).
+        let app = app_with_issues(&[]).await;
+        let (status, s) = body_of(app, "/issues").await;
+        assert_eq!(status, StatusCode::OK);
+        assert!(
+            s.contains(r#"href="/issues/new""#) && s.contains("New issue"),
+            "expected a New issue CTA linking to the create form:\n{s}"
+        );
     }
 
     #[tokio::test]

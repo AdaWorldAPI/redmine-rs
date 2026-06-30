@@ -294,6 +294,38 @@ impl ListQuery {
     }
 }
 
+/// Render a Redmine-style **contextual action bar** — the strip of
+/// action links (e.g. "New issue") Redmine renders top-right of a list
+/// or detail page, in the `#content`'s `.contextual` slot.
+///
+/// Each entry is `(label, href)`. Both are HTML-escaped: the label is
+/// user-facing text and the href lands in an attribute, so even though
+/// today's callers pass static strings, escaping keeps the contract
+/// uniform with the rest of the chrome. An empty slice yields an empty
+/// string — no stray `<nav>` in the document.
+///
+/// Generic on purpose: W2 ("New project"), W3 ("Log time"), and the
+/// issue detail page ("Edit" / "Delete") reuse this strip instead of
+/// each hand-rolling its own link row.
+#[must_use]
+pub fn render_action_bar(actions: &[(&str, &str)]) -> String {
+    if actions.is_empty() {
+        return String::new();
+    }
+    let mut out = String::with_capacity(48 + 40 * actions.len());
+    out.push_str(r#"<nav class="contextual" aria-label="Actions">"#);
+    for (label, href) in actions {
+        let _ = write!(
+            &mut out,
+            r#"<a class="action" href="{}">{}</a>"#,
+            html_escape(href),
+            html_escape(label)
+        );
+    }
+    out.push_str("</nav>");
+    out
+}
+
 /// Percent-encode a single query-string value. Conservative: anything
 /// outside the URL-unreserved set (`A-Z a-z 0-9 - . _ ~`) is `%HH`-escaped.
 fn percent_encode(s: &str) -> String {
@@ -553,5 +585,30 @@ mod tests {
         assert_eq!(percent_encode("Abc-_.~123"), "Abc-_.~123");
         assert_eq!(percent_encode("a b"), "a%20b");
         assert_eq!(percent_encode("&=?#"), "%26%3D%3F%23");
+    }
+
+    #[test]
+    fn action_bar_renders_each_link_in_a_contextual_nav() {
+        let bar = render_action_bar(&[("New issue", "/issues/new")]);
+        assert!(bar.contains(r#"class="contextual""#), "{bar}");
+        assert!(bar.contains(r#"href="/issues/new""#), "{bar}");
+        assert!(bar.contains(">New issue</a>"), "{bar}");
+    }
+
+    #[test]
+    fn action_bar_is_empty_for_no_actions() {
+        // No empty `<nav>` clutters the page when a resource has no actions.
+        assert!(render_action_bar(&[]).is_empty());
+    }
+
+    #[test]
+    fn action_bar_escapes_label_and_href() {
+        let bar = render_action_bar(&[("<x>", "/a?b=c&d=e")]);
+        assert!(!bar.contains("<x>"), "label not escaped: {bar}");
+        assert!(bar.contains("&lt;x&gt;"), "{bar}");
+        assert!(
+            bar.contains("/a?b=c&amp;d=e"),
+            "href ampersand not escaped: {bar}"
+        );
     }
 }
