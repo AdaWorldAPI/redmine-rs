@@ -37,7 +37,7 @@ use ogar_render_askama::{
 use rm_store::NewProject;
 use serde::Deserialize;
 
-use crate::common::{encode_path_segment, wrap_in_doc, AppState, HandlerError};
+use crate::common::{encode_path_segment, render_errors, wrap_in_doc, AppState, HandlerError};
 
 /// The submit URL — also the action the GET form points to.
 const SUBMIT_PATH: &str = "/projects";
@@ -181,28 +181,6 @@ fn render(form: &ProjectForm, errors: &[&str]) -> Result<Html<String>, HandlerEr
     let errors_html = render_errors(errors);
     let body = format!("{errors_html}{form_html}");
     Ok(Html(wrap_in_doc("New project", &body)))
-}
-
-/// Render the validation-error block above the form. Empty string when
-/// there are no errors. Errors are `&'static str` literals from
-/// [`validate`] — no user-controlled content reaches the HTML here.
-///
-/// Duplicated from [`crate::issues_form`] by the project's "factor on the
-/// third caller" rule (Plan §1.6); the third form module (TimeEntry /
-/// News) triggers the lift into `common`.
-fn render_errors(errors: &[&str]) -> String {
-    if errors.is_empty() {
-        return String::new();
-    }
-    let mut out = String::with_capacity(64 + errors.len() * 32);
-    out.push_str(r#"<div class="form-errors" role="alert"><ul>"#);
-    for e in errors {
-        out.push_str("<li>");
-        out.push_str(e);
-        out.push_str("</li>");
-    }
-    out.push_str("</ul></div>");
-    out
 }
 
 /// Form columns: Name (primary) + Identifier (plain). The kit reads

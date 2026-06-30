@@ -146,6 +146,31 @@ pub fn wrap_in_doc(title: &str, body: &str) -> String {
     )
 }
 
+/// Render the validation-error block shown above a create/edit form — a
+/// `role="alert"` list of messages. Empty string when there are no errors
+/// (so a clean form renders no stray block).
+///
+/// Factored here once a **third** form module (News) joined Issue +
+/// Project as a caller — the project's "three points form a line" rule
+/// (Plan §1.6). Callers pass `&'static str` literals from their own
+/// `validate`, so no user-controlled content reaches this HTML; the
+/// messages are spliced verbatim.
+#[must_use]
+pub(crate) fn render_errors(errors: &[&str]) -> String {
+    if errors.is_empty() {
+        return String::new();
+    }
+    let mut out = String::with_capacity(64 + errors.len() * 32);
+    out.push_str(r#"<div class="form-errors" role="alert"><ul>"#);
+    for e in errors {
+        out.push_str("<li>");
+        out.push_str(e);
+        out.push_str("</li>");
+    }
+    out.push_str("</ul></div>");
+    out
+}
+
 /// Hash a SurrealDB `RecordId` to a `u64` — the render kit's
 /// `render_detail(record_id: u64, ...)` parameter takes an integer
 /// for display + the `data-record-id` HTML attribute. SurrealDB
@@ -260,6 +285,16 @@ mod tests {
         assert!(html.contains("<p>body</p>"), "body not wrapped:\n{html}");
         // Viewport meta for the eventual responsive stylesheet.
         assert!(html.contains("viewport"), "viewport meta missing:\n{html}");
+    }
+
+    #[test]
+    fn render_errors_is_empty_without_errors_and_lists_them_otherwise() {
+        assert!(render_errors(&[]).is_empty(), "no block when no errors");
+        let html = render_errors(&["Subject is required.", "Too long."]);
+        assert!(html.contains(r#"class="form-errors""#), "{html}");
+        assert!(html.contains(r#"role="alert""#), "{html}");
+        assert!(html.contains("<li>Subject is required.</li>"), "{html}");
+        assert!(html.contains("<li>Too long.</li>"), "{html}");
     }
 
     #[test]

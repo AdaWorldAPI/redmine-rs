@@ -17,6 +17,7 @@ use rm_store::NewsRow;
 use surrealdb_types::{RecordId, ToSql};
 
 use crate::common::{html_escape, record_id_to_u64, wrap_in_doc, AppState, HandlerError};
+use crate::list_chrome::render_action_bar;
 
 /// `GET /news` — render the news list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -59,8 +60,11 @@ pub async fn list(State(state): State<AppState>) -> Result<Html<String>, Handler
             block: Vec::new(),
         })
         .collect();
-    let body = render_list("News", 0x0114, "project_news", &cols, &[], &rows)
+    let table = render_list("News", 0x0114, "project_news", &cols, &[], &rows)
         .map_err(|e| HandlerError::Render(e.to_string()))?;
+    // Redmine's "Add news" contextual action, top-right of the list.
+    let action_bar = render_action_bar(&[("Add news", "/news/new")]);
+    let body = format!("{action_bar}\n{table}");
     Ok(Html(wrap_in_doc("News", &body)))
 }
 
@@ -185,6 +189,23 @@ mod tests {
         assert!(s.contains("Release 0.1"));
         assert!(s.contains("MVP ships"));
         assert!(s.contains("href=\"/news/"));
+    }
+
+    #[tokio::test]
+    async fn list_shows_add_news_action_link() {
+        let store = Store::open().await.unwrap();
+        let app = router(AppState { store });
+        let res = app
+            .oneshot(Request::builder().uri("/news").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let s = std::str::from_utf8(&body).unwrap();
+        assert!(
+            s.contains(r#"href="/news/new""#) && s.contains("Add news"),
+            "expected an Add news CTA linking to the create form:\n{s}"
+        );
     }
 
     #[tokio::test]
