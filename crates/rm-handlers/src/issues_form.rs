@@ -50,7 +50,7 @@ use rm_store::NewIssue;
 use serde::Deserialize;
 use surrealdb_types::ToSql;
 
-use crate::common::{wrap_in_doc, AppState, HandlerError};
+use crate::common::{render_errors, wrap_in_doc, AppState, HandlerError};
 
 /// The submit URL — also the action the GET form points to.
 const SUBMIT_PATH: &str = "/issues";
@@ -170,26 +170,6 @@ fn render(form: &IssueForm, errors: &[&str]) -> Result<Html<String>, HandlerErro
     let errors_html = render_errors(errors);
     let body = format!("{errors_html}{form_html}");
     Ok(Html(wrap_in_doc("New issue", &body)))
-}
-
-/// Render the validation-error block above the form. Empty string when
-/// there are no errors. Errors are static `&'static str` literals from
-/// [`validate`] — no user-controlled content reaches the HTML here, so
-/// the literal strings are safe.
-fn render_errors(errors: &[&str]) -> String {
-    if errors.is_empty() {
-        return String::new();
-    }
-    let mut out = String::with_capacity(64 + errors.len() * 32);
-    out.push_str(r#"<div class="form-errors" role="alert"><ul>"#);
-    for e in errors {
-        // Static literals only; no untrusted data here.
-        out.push_str("<li>");
-        out.push_str(e);
-        out.push_str("</li>");
-    }
-    out.push_str("</ul></div>");
-    out
 }
 
 /// Form columns: Subject (the kit pulls `required` from the field's

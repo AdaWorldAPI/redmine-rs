@@ -19,6 +19,7 @@ use rm_store::WikiPageRow;
 use crate::common::{
     encode_path_segment, html_escape, identifier_to_u64, wrap_in_doc, AppState, HandlerError,
 };
+use crate::list_chrome::render_action_bar;
 
 /// `GET /wiki` — render the wiki-page list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -47,8 +48,11 @@ pub async fn list(State(state): State<AppState>) -> Result<Html<String>, Handler
             block: Vec::new(),
         })
         .collect();
-    let body = render_list("Wiki", 0x010C, "project_wiki_page", &cols, &[], &rows)
+    let table = render_list("Wiki", 0x010C, "project_wiki_page", &cols, &[], &rows)
         .map_err(|e| HandlerError::Render(e.to_string()))?;
+    // Redmine's "New wiki page" contextual action, top-right of the list.
+    let action_bar = render_action_bar(&[("New wiki page", "/wiki/new")]);
+    let body = format!("{action_bar}\n{table}");
     Ok(Html(wrap_in_doc("Wiki", &body)))
 }
 
@@ -136,6 +140,23 @@ mod tests {
         let s = std::str::from_utf8(&body).unwrap();
         assert!(s.contains("data-class-id=\"0x010C\""));
         assert!(s.contains("No data."));
+    }
+
+    #[tokio::test]
+    async fn list_shows_new_wiki_page_action_link() {
+        let store = Store::open().await.unwrap();
+        let app = router(AppState { store });
+        let res = app
+            .oneshot(Request::builder().uri("/wiki").body(Body::empty()).unwrap())
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let s = std::str::from_utf8(&body).unwrap();
+        assert!(
+            s.contains(r#"href="/wiki/new""#) && s.contains("New wiki page"),
+            "expected a New wiki page CTA linking to the create form:\n{s}"
+        );
     }
 
     #[tokio::test]

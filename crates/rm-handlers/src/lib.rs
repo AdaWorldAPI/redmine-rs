@@ -46,11 +46,14 @@
 #![warn(missing_docs)]
 
 mod common;
+pub mod home;
 pub mod issues;
 pub mod issues_form;
 pub mod list_chrome;
 pub mod news;
+pub mod news_form;
 pub mod projects;
+pub mod projects_form;
 pub mod queries;
 pub mod relations;
 pub mod roles;
@@ -58,6 +61,7 @@ pub mod scm;
 pub mod taxonomy;
 pub mod time_entries;
 pub mod users;
+pub mod wiki_form;
 pub mod wiki_pages;
 
 pub use common::{

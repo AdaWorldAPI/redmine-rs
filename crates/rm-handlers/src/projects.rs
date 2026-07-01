@@ -23,6 +23,7 @@ use rm_store::ProjectRow;
 use crate::common::{
     encode_path_segment, html_escape, identifier_to_u64, wrap_in_doc, AppState, HandlerError,
 };
+use crate::list_chrome::render_action_bar;
 
 /// `GET /projects` — render the project list.
 pub async fn list(State(state): State<AppState>) -> Result<Html<String>, HandlerError> {
@@ -63,8 +64,11 @@ pub async fn list(State(state): State<AppState>) -> Result<Html<String>, Handler
             block: Vec::new(),
         })
         .collect();
-    let body = render_list("Projects", 0x0101, "project", &cols, &[], &rows)
+    let table = render_list("Projects", 0x0101, "project", &cols, &[], &rows)
         .map_err(|e| HandlerError::Render(e.to_string()))?;
+    // Redmine's "+ New project" contextual action, top-right of the list.
+    let action_bar = render_action_bar(&[("New project", "/projects/new")]);
+    let body = format!("{action_bar}\n{table}");
     Ok(Html(wrap_in_doc("Projects", &body)))
 }
 
@@ -210,6 +214,29 @@ mod tests {
             "expected detail href:\n{s}"
         );
         assert!(s.contains("href=\"/projects/beta-proj\""), "{s}");
+    }
+
+    #[tokio::test]
+    async fn list_shows_new_project_action_link() {
+        // The "+ New project" CTA links the list to the D1 create form,
+        // present even on an empty list.
+        let app = app_with_projects(&[]).await;
+        let res = app
+            .oneshot(
+                Request::builder()
+                    .uri("/projects")
+                    .body(Body::empty())
+                    .unwrap(),
+            )
+            .await
+            .unwrap();
+        assert_eq!(res.status(), StatusCode::OK);
+        let body = res.into_body().collect().await.unwrap().to_bytes();
+        let s = std::str::from_utf8(&body).unwrap();
+        assert!(
+            s.contains(r#"href="/projects/new""#) && s.contains("New project"),
+            "expected a New project CTA linking to the create form:\n{s}"
+        );
     }
 
     #[tokio::test]
