@@ -1,0 +1,33 @@
+{
+  "app": "redmine",
+  "identity": "declarations == emitted_as_ore + escaped, per stratum; seed strata also unresolved_values == facts",
+  "strata": [
+    {
+      "declarations": 1,
+      "emitted_as_ore": 1,
+      "escaped": 0,
+      "facts": 0,
+      "scanned_files": 1,
+      "stratum": "K1/files",
+      "unit": "route files"
+    },
+    {
+      "declarations": 482,
+      "emitted_as_ore": 466,
+      "escaped": 16,
+      "facts": 16,
+      "scanned_files": 1,
+      "stratum": "K1",
+      "unit": "route declarations"
+    },
+    {
+      "declarations": 165,
+      "emitted_as_ore": 164,
+      "escaped": 1,
+      "facts": 1,
+      "scanned_files": 65,
+      "stratum": "K2/filters",
+      "unit": "filter macro calls"
+    }
+  ]
+}

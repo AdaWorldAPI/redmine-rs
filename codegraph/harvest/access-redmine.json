@@ -1,0 +1,1863 @@
+{
+  "app": "redmine",
+  "filters": [
+    {
+      "controller": "AccountController",
+      "file": "app/controllers/account_controller.rb",
+      "filter": "check_if_login_required",
+      "line": 27,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "AccountController",
+      "file": "app/controllers/account_controller.rb",
+      "filter": "check_password_change",
+      "line": 27,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "AccountController",
+      "file": "app/controllers/account_controller.rb",
+      "filter": "check_twofa_activation",
+      "line": 28,
+      "macro": "skip_before_action",
+      "only": [
+        "logout",
+        "lost_password"
+      ]
+    },
+    {
+      "controller": "AccountController",
+      "file": "app/controllers/account_controller.rb",
+      "filter": "require_active_twofa",
+      "line": 208,
+      "macro": "before_action",
+      "only": [
+        "twofa_resend",
+        "twofa_confirm",
+        "twofa"
+      ]
+    },
+    {
+      "controller": "AccountController",
+      "file": "app/controllers/account_controller.rb",
+      "filter": "twofa_setup",
+      "line": 208,
+      "macro": "before_action",
+      "only": [
+        "twofa_resend",
+        "twofa_confirm",
+        "twofa"
+      ]
+    },
+    {
+      "controller": "AccountController",
+      "file": "app/controllers/account_controller.rb",
+      "filter": "prevent_twofa_session_replay",
+      "line": 209,
+      "macro": "before_action",
+      "only": [
+        "twofa_resend",
+        "twofa"
+      ]
+    },
+    {
+      "controller": "ActivitiesController",
+      "file": "app/controllers/activities_controller.rb",
+      "filter": "find_optional_project_by_id",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ActivitiesController",
+      "file": "app/controllers/activities_controller.rb",
+      "filter": "authorize_global",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "AdminController",
+      "file": "app/controllers/admin_controller.rb",
+      "filter": "require_admin",
+      "line": 28,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "api_session",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "session_expiration",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "user_setup",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "check_if_login_required",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "set_localization",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "check_password_change",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ApplicationController",
+      "file": "app/controllers/application_controller.rb",
+      "filter": "check_twofa_activation",
+      "line": 64,
+      "macro": "before_action"
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "find_attachment",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "download",
+        "thumbnail",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "find_container",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "edit_all",
+        "update_all",
+        "download_all"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "find_downloadable_attachments",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "download_all"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "find_editable_attachments",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "edit_all",
+        "update_all"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "file_readable",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "download",
+        "thumbnail"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "read_authorize",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "download",
+        "thumbnail"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "update_authorize",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "update"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "delete_authorize",
+      "line": 29,
+      "macro": "before_action",
+      "only": [
+        "destroy"
+      ]
+    },
+    {
+      "controller": "AttachmentsController",
+      "file": "app/controllers/attachments_controller.rb",
+      "filter": "authorize_global",
+      "line": 30,
+      "macro": "before_action",
+      "only": [
+        "upload"
+      ]
+    },
+    {
+      "controller": "AuthSourcesController",
+      "file": "app/controllers/auth_sources_controller.rb",
+      "filter": "require_admin",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "AuthSourcesController",
+      "file": "app/controllers/auth_sources_controller.rb",
+      "filter": "build_new_auth_source",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "AuthSourcesController",
+      "file": "app/controllers/auth_sources_controller.rb",
+      "filter": "find_auth_source",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "test_connection",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "AutoCompletesController",
+      "file": "app/controllers/auto_completes_controller.rb",
+      "filter": "find_project",
+      "line": 21,
+      "macro": "before_action"
+    },
+    {
+      "controller": "AvatarsController",
+      "file": "app/controllers/avatars_controller.rb",
+      "filter": "find_avatar",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "show"
+      ]
+    },
+    {
+      "controller": "AvatarsController",
+      "except": [
+        "show"
+      ],
+      "file": "app/controllers/avatars_controller.rb",
+      "filter": "find_user",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "AvatarsController",
+      "except": [
+        "edit"
+      ],
+      "file": "app/controllers/avatars_controller.rb",
+      "filter": "check_avatar_available",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "BoardsController",
+      "file": "app/controllers/boards_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "BoardsController",
+      "file": "app/controllers/boards_controller.rb",
+      "filter": "find_board_if_available",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "BoardsController",
+      "file": "app/controllers/boards_controller.rb",
+      "filter": "authorize",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CalendarsController",
+      "file": "app/controllers/calendars_controller.rb",
+      "filter": "find_optional_project",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CommentsController",
+      "file": "app/controllers/comments_controller.rb",
+      "filter": "find_model_object",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CommentsController",
+      "file": "app/controllers/comments_controller.rb",
+      "filter": "find_project_from_association",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CommentsController",
+      "file": "app/controllers/comments_controller.rb",
+      "filter": "authorize",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::IssuesController",
+      "file": "app/controllers/context_menus/issues_controller.rb",
+      "filter": "find_issues",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "index"
+      ]
+    },
+    {
+      "controller": "ContextMenus::NonWorkingDatesController",
+      "file": "app/controllers/context_menus/non_working_dates_controller.rb",
+      "filter": "require_admin",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::NonWorkingDatesController",
+      "file": "app/controllers/context_menus/non_working_dates_controller.rb",
+      "filter": "find_non_working_dates",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::ProjectsController",
+      "file": "app/controllers/context_menus/projects_controller.rb",
+      "filter": "require_admin",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::ProjectsController",
+      "file": "app/controllers/context_menus/projects_controller.rb",
+      "filter": "find_projects",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::TimeEntriesController",
+      "file": "app/controllers/context_menus/time_entries_controller.rb",
+      "filter": "find_time_entries",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::UsersController",
+      "file": "app/controllers/context_menus/users_controller.rb",
+      "filter": "require_admin",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ContextMenus::UsersController",
+      "file": "app/controllers/context_menus/users_controller.rb",
+      "filter": "find_users",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CustomFieldEnumerationsController",
+      "file": "app/controllers/custom_field_enumerations_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CustomFieldEnumerationsController",
+      "file": "app/controllers/custom_field_enumerations_controller.rb",
+      "filter": "find_custom_field",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CustomFieldEnumerationsController",
+      "file": "app/controllers/custom_field_enumerations_controller.rb",
+      "filter": "find_enumeration",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "destroy"
+      ]
+    },
+    {
+      "controller": "CustomFieldsController",
+      "file": "app/controllers/custom_fields_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "CustomFieldsController",
+      "file": "app/controllers/custom_fields_controller.rb",
+      "filter": "build_new_custom_field",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "CustomFieldsController",
+      "file": "app/controllers/custom_fields_controller.rb",
+      "filter": "find_custom_field",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "DocumentsController",
+      "file": "app/controllers/documents_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "DocumentsController",
+      "except": [
+        "index",
+        "new",
+        "create"
+      ],
+      "file": "app/controllers/documents_controller.rb",
+      "filter": "find_model_object",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "DocumentsController",
+      "except": [
+        "index",
+        "new",
+        "create"
+      ],
+      "file": "app/controllers/documents_controller.rb",
+      "filter": "find_project_from_association",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "DocumentsController",
+      "file": "app/controllers/documents_controller.rb",
+      "filter": "authorize",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "EmailAddressesController",
+      "file": "app/controllers/email_addresses_controller.rb",
+      "filter": "find_user",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "EmailAddressesController",
+      "file": "app/controllers/email_addresses_controller.rb",
+      "filter": "require_admin_or_current_user",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "EmailAddressesController",
+      "file": "app/controllers/email_addresses_controller.rb",
+      "filter": "find_email_address",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "EnumerationsController",
+      "except": [
+        "index"
+      ],
+      "file": "app/controllers/enumerations_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "EnumerationsController",
+      "file": "app/controllers/enumerations_controller.rb",
+      "filter": "require_admin_or_api_request",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "index"
+      ]
+    },
+    {
+      "controller": "EnumerationsController",
+      "file": "app/controllers/enumerations_controller.rb",
+      "filter": "build_new_enumeration",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "EnumerationsController",
+      "file": "app/controllers/enumerations_controller.rb",
+      "filter": "find_enumeration",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "FaviconsController",
+      "file": "app/controllers/favicons_controller.rb",
+      "filter": "check_if_login_required",
+      "line": 22,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "FaviconsController",
+      "file": "app/controllers/favicons_controller.rb",
+      "filter": "check_password_change",
+      "line": 22,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "FaviconsController",
+      "file": "app/controllers/favicons_controller.rb",
+      "filter": "check_twofa_activation",
+      "line": 22,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "FilesController",
+      "file": "app/controllers/files_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "FilesController",
+      "file": "app/controllers/files_controller.rb",
+      "filter": "authorize",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "GanttsController",
+      "file": "app/controllers/gantts_controller.rb",
+      "filter": "find_optional_project",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "GroupsController",
+      "except": [
+        "show"
+      ],
+      "file": "app/controllers/groups_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "GroupsController",
+      "except": [
+        "index",
+        "new",
+        "create"
+      ],
+      "file": "app/controllers/groups_controller.rb",
+      "filter": "find_group",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ImportsController",
+      "file": "app/controllers/imports_controller.rb",
+      "filter": "find_import",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "settings",
+        "mapping",
+        "run"
+      ]
+    },
+    {
+      "controller": "ImportsController",
+      "file": "app/controllers/imports_controller.rb",
+      "filter": "authorize_import",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "IssueCategoriesController",
+      "except": [
+        "index",
+        "new",
+        "create"
+      ],
+      "file": "app/controllers/issue_categories_controller.rb",
+      "filter": "find_model_object",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "IssueCategoriesController",
+      "except": [
+        "index",
+        "new",
+        "create"
+      ],
+      "file": "app/controllers/issue_categories_controller.rb",
+      "filter": "find_project_from_association",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "IssueCategoriesController",
+      "file": "app/controllers/issue_categories_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "IssueCategoriesController",
+      "file": "app/controllers/issue_categories_controller.rb",
+      "filter": "authorize",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "IssueRelationsController",
+      "file": "app/controllers/issue_relations_controller.rb",
+      "filter": "find_issue",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "create"
+      ]
+    },
+    {
+      "controller": "IssueRelationsController",
+      "file": "app/controllers/issue_relations_controller.rb",
+      "filter": "authorize",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "create"
+      ]
+    },
+    {
+      "controller": "IssueRelationsController",
+      "file": "app/controllers/issue_relations_controller.rb",
+      "filter": "find_relation",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "IssueStatusesController",
+      "except": [
+        "index"
+      ],
+      "file": "app/controllers/issue_statuses_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "IssueStatusesController",
+      "file": "app/controllers/issue_statuses_controller.rb",
+      "filter": "require_admin_or_api_request",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "index"
+      ]
+    },
+    {
+      "controller": "IssuesController",
+      "file": "app/controllers/issues_controller.rb",
+      "filter": "find_issue",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "edit",
+        "update",
+        "issue_tab"
+      ]
+    },
+    {
+      "controller": "IssuesController",
+      "file": "app/controllers/issues_controller.rb",
+      "filter": "find_issues",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "bulk_edit",
+        "bulk_update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "IssuesController",
+      "except": [
+        "index",
+        "new",
+        "create"
+      ],
+      "file": "app/controllers/issues_controller.rb",
+      "filter": "authorize",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "IssuesController",
+      "file": "app/controllers/issues_controller.rb",
+      "filter": "find_optional_project",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "IssuesController",
+      "file": "app/controllers/issues_controller.rb",
+      "filter": "build_new_issue_from_params",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "JournalsController",
+      "file": "app/controllers/journals_controller.rb",
+      "filter": "find_journal",
+      "line": 21,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "diff"
+      ]
+    },
+    {
+      "controller": "JournalsController",
+      "file": "app/controllers/journals_controller.rb",
+      "filter": "find_issue",
+      "line": 22,
+      "macro": "before_action",
+      "only": [
+        "new"
+      ]
+    },
+    {
+      "controller": "JournalsController",
+      "file": "app/controllers/journals_controller.rb",
+      "filter": "find_optional_project",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "index"
+      ]
+    },
+    {
+      "controller": "JournalsController",
+      "file": "app/controllers/journals_controller.rb",
+      "filter": "authorize",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "edit",
+        "update",
+        "diff"
+      ]
+    },
+    {
+      "controller": "MailHandlerController",
+      "file": "app/controllers/mail_handler_controller.rb",
+      "filter": "check_credential",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MailHandlerController",
+      "file": "app/controllers/mail_handler_controller.rb",
+      "filter": "verify_authenticity_token",
+      "line": 26,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "MembersController",
+      "except": [
+        "index",
+        "new",
+        "create",
+        "autocomplete"
+      ],
+      "file": "app/controllers/members_controller.rb",
+      "filter": "find_model_object",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MembersController",
+      "except": [
+        "index",
+        "new",
+        "create",
+        "autocomplete"
+      ],
+      "file": "app/controllers/members_controller.rb",
+      "filter": "find_project_from_association",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MembersController",
+      "file": "app/controllers/members_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "new",
+        "create",
+        "autocomplete"
+      ]
+    },
+    {
+      "controller": "MembersController",
+      "file": "app/controllers/members_controller.rb",
+      "filter": "authorize",
+      "line": 28,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MessagesController",
+      "file": "app/controllers/messages_controller.rb",
+      "filter": "find_board",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "preview"
+      ]
+    },
+    {
+      "controller": "MessagesController",
+      "file": "app/controllers/messages_controller.rb",
+      "filter": "find_attachments",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "preview"
+      ]
+    },
+    {
+      "controller": "MessagesController",
+      "except": [
+        "new",
+        "preview"
+      ],
+      "file": "app/controllers/messages_controller.rb",
+      "filter": "find_message",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MessagesController",
+      "except": [
+        "preview",
+        "edit",
+        "destroy"
+      ],
+      "file": "app/controllers/messages_controller.rb",
+      "filter": "authorize",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MyController",
+      "file": "app/controllers/my_controller.rb",
+      "filter": "require_login",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "MyController",
+      "file": "app/controllers/my_controller.rb",
+      "filter": "check_password_change",
+      "line": 24,
+      "macro": "skip_before_action",
+      "only": [
+        "password"
+      ]
+    },
+    {
+      "controller": "MyController",
+      "file": "app/controllers/my_controller.rb",
+      "filter": "check_twofa_activation",
+      "line": 24,
+      "macro": "skip_before_action",
+      "only": [
+        "password"
+      ]
+    },
+    {
+      "controller": "MyController",
+      "file": "app/controllers/my_controller.rb",
+      "filter": "deny_account_modification_via_oauth",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "account"
+      ]
+    },
+    {
+      "controller": "NewsController",
+      "except": [
+        "new",
+        "create",
+        "index"
+      ],
+      "file": "app/controllers/news_controller.rb",
+      "filter": "find_model_object",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "NewsController",
+      "except": [
+        "new",
+        "create",
+        "index"
+      ],
+      "file": "app/controllers/news_controller.rb",
+      "filter": "find_project_from_association",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "NewsController",
+      "file": "app/controllers/news_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "create"
+      ]
+    },
+    {
+      "controller": "NewsController",
+      "except": [
+        "index",
+        "new"
+      ],
+      "file": "app/controllers/news_controller.rb",
+      "filter": "authorize",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "NewsController",
+      "file": "app/controllers/news_controller.rb",
+      "filter": "find_optional_project",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "new"
+      ]
+    },
+    {
+      "controller": "NonWorkingDatesController",
+      "file": "app/controllers/non_working_dates_controller.rb",
+      "filter": "require_admin",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "NonWorkingDatesController",
+      "file": "app/controllers/non_working_dates_controller.rb",
+      "filter": "find_non_working_date",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "PreviewsController",
+      "except": [
+        "text"
+      ],
+      "file": "app/controllers/previews_controller.rb",
+      "filter": "find_project",
+      "line": 21,
+      "macro": "before_action"
+    },
+    {
+      "controller": "PreviewsController",
+      "file": "app/controllers/previews_controller.rb",
+      "filter": "find_attachments",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "PrincipalMembershipsController",
+      "file": "app/controllers/principal_memberships_controller.rb",
+      "filter": "require_admin",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "PrincipalMembershipsController",
+      "file": "app/controllers/principal_memberships_controller.rb",
+      "filter": "find_principal",
+      "line": 27,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "PrincipalMembershipsController",
+      "file": "app/controllers/principal_memberships_controller.rb",
+      "filter": "find_membership",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "ProjectEnumerationsController",
+      "file": "app/controllers/project_enumerations_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 21,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ProjectEnumerationsController",
+      "file": "app/controllers/project_enumerations_controller.rb",
+      "filter": "authorize",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ProjectsController",
+      "except": [
+        "index",
+        "autocomplete",
+        "list",
+        "new",
+        "create",
+        "copy",
+        "bulk_destroy"
+      ],
+      "file": "app/controllers/projects_controller.rb",
+      "filter": "find_project",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ProjectsController",
+      "except": [
+        "index",
+        "autocomplete",
+        "list",
+        "new",
+        "create",
+        "copy",
+        "archive",
+        "unarchive",
+        "destroy",
+        "bulk_destroy"
+      ],
+      "file": "app/controllers/projects_controller.rb",
+      "filter": "authorize",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ProjectsController",
+      "file": "app/controllers/projects_controller.rb",
+      "filter": "authorize_global",
+      "line": 31,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "ProjectsController",
+      "file": "app/controllers/projects_controller.rb",
+      "filter": "require_admin",
+      "line": 32,
+      "macro": "before_action",
+      "only": [
+        "copy",
+        "archive",
+        "unarchive",
+        "bulk_destroy"
+      ]
+    },
+    {
+      "controller": "QueriesController",
+      "file": "app/controllers/queries_controller.rb",
+      "filter": "find_query",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "QueriesController",
+      "file": "app/controllers/queries_controller.rb",
+      "filter": "find_optional_project",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "ReactionsController",
+      "file": "app/controllers/reactions_controller.rb",
+      "filter": "require_login",
+      "line": 21,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ReactionsController",
+      "file": "app/controllers/reactions_controller.rb",
+      "filter": "check_enabled",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ReactionsController",
+      "file": "app/controllers/reactions_controller.rb",
+      "filter": "set_object",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ReactionsController",
+      "file": "app/controllers/reactions_controller.rb",
+      "filter": "authorize_reactable",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ReportsController",
+      "file": "app/controllers/reports_controller.rb",
+      "filter": "find_project",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ReportsController",
+      "file": "app/controllers/reports_controller.rb",
+      "filter": "authorize",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "ReportsController",
+      "file": "app/controllers/reports_controller.rb",
+      "filter": "find_issue_statuses",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "RepositoriesController",
+      "file": "app/controllers/repositories_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 31,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "RepositoriesController",
+      "file": "app/controllers/repositories_controller.rb",
+      "filter": "build_new_repository_from_params",
+      "line": 32,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "RepositoriesController",
+      "file": "app/controllers/repositories_controller.rb",
+      "filter": "find_repository",
+      "line": 33,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy",
+        "committers"
+      ]
+    },
+    {
+      "controller": "RepositoriesController",
+      "except": [
+        "new",
+        "create",
+        "edit",
+        "update",
+        "destroy",
+        "committers"
+      ],
+      "file": "app/controllers/repositories_controller.rb",
+      "filter": "find_project_repository",
+      "line": 34,
+      "macro": "before_action"
+    },
+    {
+      "controller": "RepositoriesController",
+      "file": "app/controllers/repositories_controller.rb",
+      "filter": "find_changeset",
+      "line": 35,
+      "macro": "before_action",
+      "only": [
+        "revision",
+        "add_related_issue",
+        "remove_related_issue"
+      ]
+    },
+    {
+      "controller": "RepositoriesController",
+      "file": "app/controllers/repositories_controller.rb",
+      "filter": "authorize",
+      "line": 36,
+      "macro": "before_action"
+    },
+    {
+      "controller": "RolesController",
+      "except": [
+        "index",
+        "show"
+      ],
+      "file": "app/controllers/roles_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "RolesController",
+      "file": "app/controllers/roles_controller.rb",
+      "filter": "require_admin_or_api_request",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "show"
+      ]
+    },
+    {
+      "controller": "RolesController",
+      "file": "app/controllers/roles_controller.rb",
+      "filter": "find_role",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "SearchController",
+      "file": "app/controllers/search_controller.rb",
+      "filter": "find_optional_project_by_id",
+      "line": 21,
+      "macro": "before_action"
+    },
+    {
+      "controller": "SearchController",
+      "file": "app/controllers/search_controller.rb",
+      "filter": "authorize_global",
+      "line": 21,
+      "macro": "before_action"
+    },
+    {
+      "controller": "SettingsController",
+      "file": "app/controllers/settings_controller.rb",
+      "filter": "require_admin",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "SysController",
+      "file": "app/controllers/sys_controller.rb",
+      "filter": "check_enabled",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "SysController",
+      "file": "app/controllers/sys_controller.rb",
+      "filter": "verify_authenticity_token",
+      "line": 26,
+      "macro": "skip_before_action"
+    },
+    {
+      "controller": "TimelogController",
+      "file": "app/controllers/timelog_controller.rb",
+      "filter": "find_time_entry",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "edit",
+        "update"
+      ]
+    },
+    {
+      "controller": "TimelogController",
+      "file": "app/controllers/timelog_controller.rb",
+      "filter": "check_editability",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update"
+      ]
+    },
+    {
+      "controller": "TimelogController",
+      "file": "app/controllers/timelog_controller.rb",
+      "filter": "find_time_entries",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "bulk_edit",
+        "bulk_update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "TimelogController",
+      "file": "app/controllers/timelog_controller.rb",
+      "filter": "authorize",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "edit",
+        "update",
+        "bulk_edit",
+        "bulk_update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "TimelogController",
+      "file": "app/controllers/timelog_controller.rb",
+      "filter": "find_optional_issue",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create"
+      ]
+    },
+    {
+      "controller": "TimelogController",
+      "file": "app/controllers/timelog_controller.rb",
+      "filter": "find_optional_project",
+      "line": 29,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "report"
+      ]
+    },
+    {
+      "controller": "TrackersController",
+      "except": [
+        "index"
+      ],
+      "file": "app/controllers/trackers_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "TrackersController",
+      "file": "app/controllers/trackers_controller.rb",
+      "filter": "require_admin_or_api_request",
+      "line": 25,
+      "macro": "before_action",
+      "only": [
+        "index"
+      ]
+    },
+    {
+      "controller": "TwofaBackupCodesController",
+      "file": "app/controllers/twofa_backup_codes_controller.rb",
+      "filter": "require_login",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "TwofaBackupCodesController",
+      "file": "app/controllers/twofa_backup_codes_controller.rb",
+      "filter": "require_active_twofa",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "TwofaBackupCodesController",
+      "file": "app/controllers/twofa_backup_codes_controller.rb",
+      "filter": "twofa_setup",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "require_login",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "require_admin",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "admin_deactivate"
+      ]
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "require_active_twofa",
+      "line": 28,
+      "macro": "before_action"
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "check_twofa_activation",
+      "line": 34,
+      "macro": "skip_before_action",
+      "only": [
+        "select_scheme",
+        "activate_init",
+        "activate_confirm",
+        "activate"
+      ]
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "ensure_user_has_no_twofa",
+      "line": 36,
+      "macro": "before_action",
+      "only": [
+        "select_scheme",
+        "activate_init",
+        "activate_confirm",
+        "activate"
+      ]
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "activate_setup",
+      "line": 42,
+      "macro": "before_action",
+      "only": [
+        "activate_init",
+        "activate_confirm",
+        "activate"
+      ]
+    },
+    {
+      "controller": "TwofaController",
+      "file": "app/controllers/twofa_controller.rb",
+      "filter": "deactivate_setup",
+      "line": 65,
+      "macro": "before_action",
+      "only": [
+        "deactivate_init",
+        "deactivate_confirm",
+        "deactivate"
+      ]
+    },
+    {
+      "controller": "UsersController",
+      "except": [
+        "show"
+      ],
+      "file": "app/controllers/users_controller.rb",
+      "filter": "require_admin",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "UsersController",
+      "file": "app/controllers/users_controller.rb",
+      "filter": "find_user",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "VersionsController",
+      "except": [
+        "index",
+        "new",
+        "create",
+        "close_completed"
+      ],
+      "file": "app/controllers/versions_controller.rb",
+      "filter": "find_model_object",
+      "line": 24,
+      "macro": "before_action"
+    },
+    {
+      "controller": "VersionsController",
+      "except": [
+        "index",
+        "new",
+        "create",
+        "close_completed"
+      ],
+      "file": "app/controllers/versions_controller.rb",
+      "filter": "find_project_from_association",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "VersionsController",
+      "file": "app/controllers/versions_controller.rb",
+      "filter": "find_project_by_project_id",
+      "line": 26,
+      "macro": "before_action",
+      "only": [
+        "index",
+        "new",
+        "create",
+        "close_completed"
+      ]
+    },
+    {
+      "controller": "VersionsController",
+      "file": "app/controllers/versions_controller.rb",
+      "filter": "authorize",
+      "line": 27,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WatchersController",
+      "file": "app/controllers/watchers_controller.rb",
+      "filter": "require_login",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "watch",
+        "unwatch"
+      ]
+    },
+    {
+      "controller": "WatchersController",
+      "file": "app/controllers/watchers_controller.rb",
+      "filter": "find_watchables",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "watch",
+        "unwatch"
+      ]
+    },
+    {
+      "controller": "WatchersController",
+      "file": "app/controllers/watchers_controller.rb",
+      "filter": "find_project",
+      "line": 33,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create",
+        "append",
+        "destroy",
+        "autocomplete_for_user",
+        "autocomplete_for_mention"
+      ]
+    },
+    {
+      "controller": "WatchersController",
+      "file": "app/controllers/watchers_controller.rb",
+      "filter": "authorize",
+      "line": 33,
+      "macro": "before_action",
+      "only": [
+        "new",
+        "create",
+        "append",
+        "destroy",
+        "autocomplete_for_user",
+        "autocomplete_for_mention"
+      ]
+    },
+    {
+      "controller": "WebhooksController",
+      "file": "app/controllers/webhooks_controller.rb",
+      "filter": "require_login",
+      "line": 23,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WebhooksController",
+      "file": "app/controllers/webhooks_controller.rb",
+      "filter": "check_enabled_or_admin",
+      "line": 24,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "WebhooksController",
+      "except": [
+        "edit",
+        "update",
+        "destroy"
+      ],
+      "file": "app/controllers/webhooks_controller.rb",
+      "filter": "check_enabled",
+      "line": 25,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WebhooksController",
+      "file": "app/controllers/webhooks_controller.rb",
+      "filter": "authorize",
+      "line": 26,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WebhooksController",
+      "file": "app/controllers/webhooks_controller.rb",
+      "filter": "find_webhook",
+      "line": 28,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "destroy"
+      ]
+    },
+    {
+      "controller": "WelcomeController",
+      "file": "app/controllers/welcome_controller.rb",
+      "filter": "check_if_login_required",
+      "line": 23,
+      "macro": "skip_before_action",
+      "only": [
+        "robots"
+      ]
+    },
+    {
+      "controller": "WikiController",
+      "file": "app/controllers/wiki_controller.rb",
+      "filter": "find_wiki",
+      "line": 36,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WikiController",
+      "file": "app/controllers/wiki_controller.rb",
+      "filter": "authorize",
+      "line": 36,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WikiController",
+      "file": "app/controllers/wiki_controller.rb",
+      "filter": "find_existing_or_new_page",
+      "line": 37,
+      "macro": "before_action",
+      "only": [
+        "show",
+        "edit"
+      ]
+    },
+    {
+      "controller": "WikiController",
+      "file": "app/controllers/wiki_controller.rb",
+      "filter": "find_existing_page",
+      "line": 38,
+      "macro": "before_action",
+      "only": [
+        "rename",
+        "protect",
+        "history",
+        "diff",
+        "annotate",
+        "add_attachment",
+        "destroy",
+        "destroy_version"
+      ]
+    },
+    {
+      "controller": "WikiController",
+      "file": "app/controllers/wiki_controller.rb",
+      "filter": "find_attachments",
+      "line": 39,
+      "macro": "before_action",
+      "only": [
+        "preview"
+      ]
+    },
+    {
+      "controller": "WikisController",
+      "file": "app/controllers/wikis_controller.rb",
+      "filter": "find_project",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WikisController",
+      "file": "app/controllers/wikis_controller.rb",
+      "filter": "authorize",
+      "line": 22,
+      "macro": "before_action"
+    },
+    {
+      "controller": "WorkflowsController",
+      "file": "app/controllers/workflows_controller.rb",
+      "filter": "find_trackers_roles_and_statuses_for_edit",
+      "line": 23,
+      "macro": "before_action",
+      "only": [
+        "edit",
+        "update",
+        "permissions",
+        "update_permissions"
+      ]
+    },
+    {
+      "controller": "WorkflowsController",
+      "file": "app/controllers/workflows_controller.rb",
+      "filter": "require_admin",
+      "line": 25,
+      "macro": "before_action"
+    }
+  ],
+  "grants": []
+}

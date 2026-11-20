@@ -1,0 +1,18 @@
+# Third Rails corpus, measured with the same compiler and no code change.
+# Corpus mode only: no slice is compiled.
+output = "target/redmine-unused"
+
+[app]
+name = "redmine"
+namespace = "redmine"
+source_env = "REDMINE_SRC"
+autoload_roots = ["app/models", "lib"]
+migrations = []
+framework_roots = ["ActiveRecord::Base", "ApplicationRecord"]
+
+[slice]
+models = []
+verbatim_file = "verbatim.txt"
+
+[klickwege]
+access = { controller_roots = ["app/controllers"], filter_macros = ["before_action", "prepend_before_action", "append_before_action", "skip_before_action"] }

@@ -1,0 +1,48 @@
+{
+  "app": "redmine",
+  "per_origin": {
+    "Klickwege": 17
+  },
+  "per_reason": [
+    {
+      "by_origin": {
+        "Klickwege": 15
+      },
+      "count": 15,
+      "examples": [],
+      "reason": "route_path_unresolved",
+      "remedy": "RuffOreExtension",
+      "stage": "Ore"
+    },
+    {
+      "by_origin": {
+        "Klickwege": 1
+      },
+      "count": 1,
+      "examples": [
+        {
+          "file": "app/controllers/users_controller.rb",
+          "line": 25,
+          "subject": "UsersController#before_action:lambda {find_user(false)}"
+        }
+      ],
+      "reason": "access_filter_unresolved",
+      "remedy": "RuffOreExtension",
+      "stage": "Ore"
+    },
+    {
+      "by_origin": {
+        "Klickwege": 1
+      },
+      "count": 1,
+      "examples": [],
+      "reason": "route_declaration_escaped",
+      "remedy": "RuffOreExtension",
+      "stage": "Ore"
+    }
+  ],
+  "per_remedy": {
+    "RuffOreExtension": 17
+  },
+  "total": 17
+}
